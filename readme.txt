@@ -74,13 +74,15 @@ March, 7th -:-- (First post-contest release)
 - Added 24 and 32 bit colordepth support (32 enabled by default)
 - Added second layer to maps, above the objects
 - Added music
-/ Added level name when entering level
+- Added level name when entering level
+/ Added menu system
 - Added experience/levelup system
 / Added inventory
 - Added new enemy type, Spider Queen
 - Added engine support for custom fonts
 - Improved Game Over screen
 - Improved GUI
+- Upgraded Lua from 4.0 to 5.0
 - Fixed little bug in linear animations
 - Fixed color of damage splats on spiders
 
