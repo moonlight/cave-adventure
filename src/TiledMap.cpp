@@ -1,7 +1,7 @@
 /*
-	The Moonlight Engine - An extendable, portable, RPG-focused game engine.
-	Project Home: http://moeng.sourceforge.net/
-	Copyright (C) 2003  Bjørn Lindeijer
+    The Moonlight Engine - An extendable, portable, RPG-focused game engine.
+    Project Home: http://moeng.sourceforge.net/
+    Copyright (C) 2003  Bjørn Lindeijer
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
