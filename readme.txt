@@ -62,7 +62,7 @@ more, if you are running in windowed mode, you might want to enable the double
 size feature. You can also use this with the fullscreen mode if your videocard 
 doesn't support 320x240 high/truecolor modes.
 
-If the game runs choppy, try reducing the colordepth from 32 to 16.
+If the game runs choppy, try reducing the colordepth to 16 or 15 bit.
 
 
 -------
