@@ -128,8 +128,9 @@ end
 
 BossShadow = {}
 function BossShadow:event_init()
-	self.bitmap = m_get_bitmap("boss_shadow.tga")
-	self.draw_mode = DM_ALPHA
+	self.bitmap = m_get_bitmap("boss_shadow.bmp")
+	self.draw_mode = DM_MULTIPLY
+	self.alpha = 128
 end
 
 

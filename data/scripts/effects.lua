@@ -65,7 +65,7 @@ end
 
 function SmallSpark:event_tick()
 	self.life_time = self.life_time - 1
-	self.alpha = max(0, min(255, 255 * self.life_time / 100))
+	self.alpha = math.max(0, math.min(255, 255 * self.life_time / 100))
 
 	self.fx = self.fx + self.speed_x
 	self.fy = self.fy + self.speed_y

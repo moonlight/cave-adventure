@@ -32,6 +32,7 @@
 --   ActionDestroyObject(obj)
 --   ActionAddObject(name, x, y)
 --   ActionQuitGame()
+--   ActionShowMapName(bitmap)
 --
 -- By Bjørn Lindeijer
 
@@ -155,7 +156,7 @@ function ActionConversation(conversation)
 
 	function me:exec()
 		if (self.conv_started == 0) then
-			m_message("Starting scripted conversation.")
+			--m_message("Starting scripted conversation.")
 			write_conversation(self.conversation)
 			self.conv_started = 1
 		end
@@ -179,7 +180,7 @@ function ActionExModeOn()
 	function me:finished()
 		table.insert(exModeArray, m_get_ex_mode())
 		m_set_ex_mode(1)
-		m_message("Exclusive mode turned on (".. table.getn(exModeArray) ..")")
+		--m_message("Exclusive mode turned on (".. table.getn(exModeArray) ..")")
 		return 1
 	end
 	return me
@@ -189,9 +190,11 @@ function ActionExModeOff()
 	local me = {}
 	me.name = "ExModeOff"
 	function me:finished()
-		m_set_ex_mode(exModeArray[table.getn(exModeArray)])
-		table.remove(exModeArray, table.getn(exModeArray))
-		m_message("Exclusive mode turned off (".. table.getn(exModeArray) ..")")
+		if (table.getn(exModeArray) > 0) then
+			m_set_ex_mode(exModeArray[table.getn(exModeArray)])
+			table.remove(exModeArray, table.getn(exModeArray))
+			--m_message("Exclusive mode turned off (".. table.getn(exModeArray) ..")")
+		end
 		return 1
 	end
 	return me
@@ -377,12 +380,14 @@ function ActionTweenVariable(obj, varname, time, to, from)
 	me.time = time
 	me.count = 0
 	me.to = to
-	me.from = from or obj[varname]
-
+	me.from = from
+	
 	function me:finished()
+		if (not self.from) then self.from = self.obj[self.varname] end
 		return (self.count > self.time)
 	end
 	function me:exec()
+		if (not self.from) then self.from = self.obj[self.varname] end
 		self.count = self.count + 1
 		if (self.count <= self.time) then
 			self.obj[self.varname] = self.from + ((self.count / self.time) * (self.to - self.from))
@@ -409,9 +414,8 @@ function ActionDestroyObject(obj)
 	return me
 end
 
---
+
 -- Add an object
---
 
 function ActionAddObject(name, x, y)
 	me = {}
@@ -440,3 +444,30 @@ function ActionQuitGame(obj)
 	return me
 end
 
+
+-- Show map name
+
+show_map_seq = nil
+
+function ActionShowMapName(bitmap)
+	me = {}
+	me.name = "ShowMapName"
+
+	function me:finished()
+		-- Make sure no other ActionShowMapName sequence is taking place
+		SeqControl:remove_sequence(show_map_seq)
+
+		-- Start a new
+		show_map_seq = SeqControl:add_sequence{
+			ActionWait(50),
+			ActionSetVariable(HUD, "map_name", bitmap),
+			ActionTweenVariable(HUD, "map_name_alpha", 100, 255, 0),
+			ActionWait(200),
+			ActionTweenVariable(HUD, "map_name_alpha", 100, 0, 255),
+		}
+
+		return 1
+	end
+
+	return me
+end

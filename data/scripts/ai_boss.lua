@@ -68,6 +68,7 @@ function BossAI:event_tick()
 	self.shadow.y = self.y - 1
 	self.shadow.offset_x = self.offset_x
 	self.shadow.offset_y = self.offset_y
+	self.shadow.alpha = self.alpha
 
 	-- Countdown charge
 	if (self.charge > 0) then self.charge = self.charge - 1 end

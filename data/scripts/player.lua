@@ -46,6 +46,12 @@ function Player:derive_attributes()
 	self.speed = 4/95 * self.agility + 53/19		-- Player speed in tiles/second
 	self.charge_time = (-40/95 * self.agility + 60 + 40/19)
 	self.attack_speed = self.charge_time/2
+
+	-- Hack to play faster
+	--self.speed = self.speed * 2
+	--self.attack_speed = self.attack_speed * 0.5
+	--self.charge_time = self.charge_time * 0.5
+	--self.maxHealth = self.maxHealth * 100
 end
 
 function Player:attack()

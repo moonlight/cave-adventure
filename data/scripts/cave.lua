@@ -99,7 +99,7 @@ function prepare_cave1()
 	m_add_object(27,8,"CavePick")
 
 	-- Map transitions
-	obj = m_add_object(2,  7, "Cave1_Naar_Cave2")
+	obj = m_add_object(0,  7, "Cave1_Naar_Cave2")
 	obj.h = 4
 end
 
@@ -222,10 +222,10 @@ function prepare_cave2()
 	m_add_object(50, 55, "CaveBridge2")
 
 	-- Falling asleep
-	m_add_object(25,  9, "CaveFallingAsleep")
+	m_add_object(25,  10, "CaveFallingAsleep")
 
 	-- Map transitions
-	obj = m_add_object(62,  64, "Cave2_Naar_Cave1")
+	obj = m_add_object(63,  64, "Cave2_Naar_Cave1")
 	obj.h = 4
 end
 

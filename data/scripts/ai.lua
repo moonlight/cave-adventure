@@ -117,7 +117,7 @@ function CommonAI:event_tick()
 end
 
 function CommonAI:attack(dir)
-	m_message("AI attacking!");
+	--m_message("AI attacking!");
 	self.dir = dir
 	self:setState(AI_ATTACK)
 	local player = m_get_player()

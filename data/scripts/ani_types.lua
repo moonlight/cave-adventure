@@ -125,7 +125,11 @@ end
 -- BASIC CHARACTER ANIMATION
 -- Switches leg every tile and adapts to character direction.
 --
-BasicCharAni = {leg_used = 0, tick_time = 1}
+BasicCharAni = {
+	leg_used = 0,
+	tick_time = 1,
+	walking = 0,
+}
 
 function BasicCharAni:start_animation(animation)
 	self.animation = animation

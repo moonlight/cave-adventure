@@ -22,10 +22,12 @@ function event_keypress(key)
 				ActionSetPosition(m_get_player(), 50, 4, DIR_DOWN), -- Normal start position in cave 1
 				--ActionSetPosition(m_get_player(), 25, 15, DIR_UP), -- Just before sequence in cave 2
 				--ActionSetPosition(m_get_player(), 35, 19, DIR_UP), -- Just before starting boss fight in cave 3
+				--ActionSetPosition(m_get_player(), 4, 5, DIR_LEFT), -- Near cave 1 exit to cave 2
 				ActionPlaySong("data/music/Cave.ogg", 100),
 				ActionFadeInMap(100),
-				ActionConversation(conv.INTRO),
+				--ActionConversation(conv.INTRO),
 				ActionExModeOff(),
+				ActionShowMapName(m_get_bitmap("cave_title_1.bmp"))
 			})
 		else
 			ConvBox:keypress()

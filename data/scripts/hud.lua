@@ -43,7 +43,10 @@ end
 --
 -- The actual HUD.
 --
-HUD = {count = 0}
+HUD = {
+	count = 0,
+	map_name_alpha = 0,
+}
 
 function HUD:initialize()
 	-- Screen size
@@ -58,7 +61,7 @@ function HUD:initialize()
 	self.eb_empty = m_get_bitmap("expbar_empty.bmp")
 	self.eb_full = m_get_bitmap("expbar_full.bmp")
 	self.eb_w, self.eb_h = m_bitmap_size(self.eb_full)
-	
+
 	-- Game over image
 	self.game_over = m_get_bitmap("game_over.bmp")
 	self.game_over_s = m_get_bitmap("game_over_s.bmp")
@@ -84,8 +87,25 @@ function HUD:draw()
 	m_set_cursor(16, 27)
 	draw_icon(self.eb_empty)
 	m_set_cursor(16, 27)
-	draw_pattern(self.eb_full, self.eb_w * experience_perc, self.eb_h) -- To be adjusted
+	draw_pattern(self.eb_full, self.eb_w * experience_perc, self.eb_h)
 	m_set_alpha(255)
+
+	-- Map name
+	if (self.map_name ~= nil and self.map_name_alpha > 0) then
+		local w, h = m_bitmap_size(self.map_name)
+		local x, y = (self.screen_w - w)/2, (self.screen_h - h)/6 * 5
+
+		local alpha = self.map_name_alpha
+		-- Take map fading into account
+		if (map_fade ~= nil and map_fade.alpha ~= nil and map_fade.alpha > 0) then
+			alpha = alpha * (255 - map_fade.alpha) / 255
+		end
+
+		m_set_cursor(x, y);      m_set_alpha(0.75 * alpha); draw_icon(self.map_name)
+		m_set_cursor(0, y - 10); m_set_alpha(alpha);        draw_rect(m_get_bitmap("pixel_black.bmp"), self.screen_w, 1)
+		m_set_cursor(0, y - 10); m_set_alpha(0.25 * alpha); draw_rect(m_get_bitmap("pixel_black.bmp"), self.screen_w, h + 20)
+		m_set_cursor(0, y + h + 10); m_set_alpha(alpha);    draw_rect(m_get_bitmap("pixel_black.bmp"), self.screen_w, 1)
+	end
 
 	-- Draw gameover screen stuff
 	if (game.game_over and game.game_over_alpha and game.game_over_alpha > 0) then

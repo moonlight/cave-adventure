@@ -134,18 +134,18 @@ function Cave1_Naar_Cave2:event_stand_on(obj)
 
 	SeqControl:add_sequence({
 		ActionExModeOn(),
-		ActionWalk(player, DIR_LEFT, 2),
+		ActionAddSequence({
+			ActionWalk(player, DIR_LEFT, 1),
+		}),
+		ActionFadeOutMap(50),
 		ActionChangeMap("data/maps/cave2.map"),
+		ActionShowMapName(m_get_bitmap("cave_title_2.bmp")),
 		ActionSetPosition(player, 64, player.y + 57, DIR_LEFT),
 		ActionAddSequence({
-			ActionWalk(player, DIR_LEFT, 3),
+			ActionWalk(player, DIR_LEFT, 2),
 			ActionExModeOff(),
 		}),
 		ActionFadeInMap(50),
-	})
-
-	SeqControl:add_sequence({
-		ActionFadeOutMap(50),
 	})
 end
 
@@ -155,17 +155,17 @@ function Cave2_Naar_Cave1:event_stand_on(obj)
 
 	SeqControl:add_sequence({
 		ActionExModeOn(),
-		ActionWalk(player, DIR_RIGHT, 2),
-		ActionChangeMap("data/maps/cave1.map"),
-		ActionSetPosition(player, 0, player.y - 57, DIR_RIGHT),
 		ActionAddSequence({
-			ActionWalk(player, DIR_RIGHT, 3),
+			ActionWalk(player, DIR_RIGHT, 1),
+		}),
+		ActionFadeOutMap(50),
+		ActionChangeMap("data/maps/cave1.map"),
+		ActionShowMapName(m_get_bitmap("cave_title_1.bmp")),
+		ActionSetPosition(player, -1, player.y - 57, DIR_RIGHT),
+		ActionAddSequence({
+			ActionWalk(player, DIR_RIGHT, 2),
 			ActionExModeOff(),
 		}),
 		ActionFadeInMap(50),
-	})
-
-	SeqControl:add_sequence({
-		ActionFadeOutMap(50),
 	})
 end

@@ -95,7 +95,7 @@ conv.INFORM_KING = {
 	{lang.CAVEMAN,  "Yes Lord, of course."},
 }
 conv.KICK_FIRST = {
-	{lang.CAVEMAN,  "Wait! Let's kick him unconscious first!"},
+	{lang.CAVEMAN,  "Wait! Let's make sure he doesn't wake up too soon."},
 }
 conv.BRING_TO_KING = {
 	{lang.CAVEMAN,  "Now let's bring him to the king."},

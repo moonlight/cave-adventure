@@ -12,15 +12,16 @@ function CaveFallingAsleep:event_stand_on(instigator)
 	local player = m_get_player()
 
 	if (instigator ~= m_get_player()) then
+		-- Some monster that wandered too far away is moving into this critical area,
+		-- so get rid of him.
 		instigator:take_damage(100)
 		return
 	end
 	SeqControl:add_sequence({
+		-- The player gets tired and is going to get some rest in a quiet corner.
 		ActionConversation(conv.YAWN_TIRED),
 		ActionExModeOn(),
-		ActionWalk(player, DIR_LEFT, 6),
-		ActionWalk(player, DIR_DOWN, 1),
-		ActionWalk(player, DIR_LEFT, 1),
+		ActionWalk(player, DIR_LEFT, 7),
 		ActionChangeDirection(player, DIR_DOWN),
 		ActionWait(25),
 		ActionConversation(conv.QUIET_CORNER),
@@ -32,9 +33,14 @@ function CaveFallingAsleep:event_stand_on(instigator)
 		ActionWait(25),
 		ActionChangeBitmap(m_get_player(), m_get_bitmap("frode_sit2.tga")),
 		ActionWait(100),
+
+		-- The player has fallen asleep, time passes...
 		ActionFadeOutMap(50),
 		ActionWait(50),
 		ActionFadeInMap(50),
+
+		-- Suddenly, a caveman arrives and notices the player. He runs away, to warn
+		-- his leader as soon as possible.
 		ActionWalk(caveman1, DIR_DOWN, 5),
 		ActionChangeDirection(caveman1, DIR_LEFT),
 		ActionWait(50),
@@ -46,8 +52,12 @@ function CaveFallingAsleep:event_stand_on(instigator)
 			ActionWalk(caveman1, DIR_RIGHT, 3),
 		}),
 		ActionFadeOutMap(56),
+
+		-- The caveman arrives at his leader. His leader sends him back to fetch the
+		-- human straight away.
 		ActionChangeMap("data/maps/cave3.map"),
 		ActionSetVariable(camera, "target", caveman1),
+		ActionSetVariable(caveman1, "offset_x", 0),
 		ActionSetPosition(caveman1, 35, 16, DIR_UP),
 		ActionAddSequence({
 			ActionFadeInMap(50),
@@ -58,6 +68,9 @@ function CaveFallingAsleep:event_stand_on(instigator)
 			ActionFadeOutMap(56),
 		}),
 		ActionWalk(caveman1, DIR_DOWN, 3),
+
+		-- Two cavemen arrive at the player, cast a spell on him and take him back
+		-- to the king
 		ActionChangeMap("data/maps/cave2.map"),
 		ActionSetPosition(caveman1, 24, 4, DIR_DOWN),
 		ActionSetPosition(caveman2, 24, 3, DIR_DOWN),
@@ -71,15 +84,19 @@ function CaveFallingAsleep:event_stand_on(instigator)
 		}),
 		ActionWalk(caveman2, DIR_DOWN, 6),
 		ActionWalk(caveman2, DIR_LEFT, 4),
-
 		ActionWait(50),
 		ActionConversation(conv.KICK_FIRST),
 		ActionWait(50),
 		ActionSetVariable(caveman1,"attacking", 1),
 		ActionCallFunction(SpawnSparkyHit, 18, 10, player.offset_x, player.offset_y, player.offset_z + 24),
+		ActionWait(40),
 		ActionSetVariable(caveman1,"attacking", 0),
+		ActionWait(10),
 		ActionConversation(conv.BRING_TO_KING),
 		ActionFadeOutMap(50),
+
+		-- The two cavemen and the player arrive at the king. The king tells the
+		-- cavemen he wants the human in his prison.
 		ActionSetPosition(camera_handle, 35, 12),
 		ActionSetVariable(camera, "target", camera_handle),
 		ActionChangeMap("data/maps/cave3.map"),
@@ -90,6 +107,8 @@ function CaveFallingAsleep:event_stand_on(instigator)
 		ActionFadeInMap(50),
 		ActionConversation(conv.BROUGHT_HUMAN),
 		ActionFadeOutMap(50),
+
+		-- The player finds himself locked in a prison.
 		ActionWait(50),
 		ActionSetVariable(camera, "target", m_get_player()),
 		ActionSetPosition(m_get_player(), 80, 20),
@@ -109,6 +128,7 @@ function CaveFallingAsleep:event_stand_on(instigator)
 		ActionSetPosition(caveman2, 69, 34, DIR_DOWN),
 
 		ActionExModeOff(),
+		ActionShowMapName(m_get_bitmap("cave_title_3.bmp")),
 	})
 end
 
@@ -124,6 +144,9 @@ function CaveNoticeStrong:event_stand_on(instigator)
 		return
 	end
 	SeqControl:add_sequence({
+		-- The player arrives at two cavemen guards. They are impressed by
+		-- his escape and tell him the story about their slavedriver, asking
+		-- the player to kill him.
 		ActionExModeOn(),
 		ActionDestroyObject(self),
 		ActionWait(50),

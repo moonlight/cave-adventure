@@ -30,16 +30,9 @@ function SeqControl:add_sequence(new_seq)
 		actions.seqId = self.nextSeqId
 		self.nextSeqId = self.nextSeqId + 1
 
-		-- Deal with all the instantly finished actions at the start
-		while (table.getn(actions) > 0 and actions[1]:finished()) do
-			--m_message("Finished executing action "..self.active_seqs[i][1].name .." (".. self.active_seqs[i].seqId ..")")
-			table.remove(actions, 1)
-		end
-
-		-- If more actions remain, add the sequence to the active sequence array
-		if (table.getn(actions) > 0) then
-			table.insert(self.active_seqs, actions)
-		end
+		-- Add the sequence to the active sequence array
+		table.insert(self.active_seqs, actions)
+		--m_message("Sequence of "..table.getn(actions).." actions added (".. actions.seqId ..").")
 
 		-- Return a reference to the added sequence
 		return actions
@@ -47,12 +40,12 @@ function SeqControl:add_sequence(new_seq)
 end
 
 function SeqControl:remove_sequence(seq)
-	m_message("SeqControl:remove_sequence() called (".. seq.seqId ..").")
 	if (not seq) then return end
+	--m_message("SeqControl:remove_sequence() called (".. seq.seqId ..").")
 
 	for i = 1, table.getn(self.active_seqs) do
 		if (self.active_seqs[i] == seq) then
-			m_message("Removing found sequence (".. seq.seqId ..").")
+			--m_message("Removing found sequence (".. seq.seqId ..").")
 			table.remove(self.active_seqs, i)
 		end
 	end
@@ -63,17 +56,17 @@ function SeqControl:update()
 	local i
 
 	for i = 1, table.getn(self.active_seqs) do
+		-- Remove any finished actions
+		while (table.getn(self.active_seqs[i]) > 0 and self.active_seqs[i][1]:finished()) do
+			--m_message("Finished executing action "..self.active_seqs[i][1].name .." (".. self.active_seqs[i].seqId ..")")
+			table.remove(self.active_seqs[i], 1)
+		end
+
 		-- Handle first non-finished action
 		if (table.getn(self.active_seqs[i]) > 0) then
 			local action = self.active_seqs[i][1]
 			--m_message("Executing action "..action.name)
 			action:exec()
-		end
-
-		-- Remove any finished actions
-		while (table.getn(self.active_seqs[i]) > 0 and self.active_seqs[i][1]:finished()) do
-			--m_message("Finished executing action "..self.active_seqs[i][1].name .." (".. self.active_seqs[i].seqId ..")")
-			table.remove(self.active_seqs[i], 1)
 		end
 	end
 	for i = 1, table.getn(self.active_seqs) do
