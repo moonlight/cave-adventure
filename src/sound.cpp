@@ -101,7 +101,7 @@ int l_play_music(lua_State *L)
 			if (found_object) {
 				play_looped_midi((MIDI*)found_object->dat, 0, -1);
 			} else {
-				console.log(CON_QUIT, CON_ALWAYS, "Could not find MIDI file in datafile (%s)", channels[channel].filename);
+				console.log(CON_LOG | CON_CONSOLE, CON_ALWAYS, "Could not find MIDI file in datafile (%s)\n", channels[channel].filename);
 			}
 		} else {
 #ifdef ENABLE_MUSIC
