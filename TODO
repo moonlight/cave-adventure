@@ -13,6 +13,12 @@ Niet ingedeeld:
   * Footsteps
 - Add menu
 - Re-add HUD
+- Make combat more interesting
+  * Add run-and-bash attack?
+  * Add kicking
+- Add saving progress to engine/scripts (needs a lot of thought)
+- Fast-skipable conversations
+- Make it possible to skip certain sequences (BeginSkipable/EndSkipable)
 
 Bjorn:
 - Re-introduce the map names
@@ -23,5 +29,6 @@ Bjorn:
 Georg:
 
 Frode:
+- Create special shadow for spiders, possibly multi-directional.
 
 Hedde:
