@@ -31,6 +31,7 @@ Spring = Decoration:subclass
 			conv.REFRESHING,
 			conv.COULD_USE_THAT,
 			conv.MUCH_BETTER,
-		}
+		},
+		bCanActivate = true,
 	};
 }

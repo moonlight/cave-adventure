@@ -123,7 +123,7 @@ function CommonAI:attack(dir)
 	local player = m_get_player()
 
 	-- Handle attack (deal damage to player)
-	player:take_damage(self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))
+	player:takeDamage(self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))
 
 	-- Spawn the hitting effect (ie. sparks)
 	if (self.attack_object) then self:attack_object(player) end

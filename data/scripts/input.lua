@@ -33,10 +33,4 @@ function event_keypress(key)
 			ConvBox:keypress()
 		end
 	end
-
-	--CombatControl:keypress(key)
-	if (key == "attack") then
-		local player = m_get_player()
-		player:attack()
-	end
 end

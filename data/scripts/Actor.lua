@@ -7,16 +7,6 @@
 import("Object.lua")
 
 
--- Helper function for spawning an Actor at a specific position
-
-spawn = function(x, y, class)
-	obj = class:new()
-	obj.x = x
-	obj.y = y
-	return obj
-end
-
-
 -- The Actor class
 
 Actor = Object:subclass
@@ -52,12 +42,38 @@ Actor = Object:subclass
 	-- OBJECT FUNCTIONS
 	--
 
-	walk = function(self, dir, no_collision)
-		if (no_collision) then
-			m_walk_obj_nocol(self, dir)
-		else
-			m_walk_obj(self, dir)
+	init = function(self)
+		self.health = self.maxHealth
+	end;
+
+
+	-- Spawns an actor, defaults to spawning at the spawner's location
+	-- and with the spawner as owner.
+	--
+	spawn = function(self, class, x, y, owner)
+		if (not class or type(class) ~= "table") then error("No valid class to spawn specified!") end
+		local obj = class:new()
+
+		-- Set position
+		if (self._instance or (x and y)) then
+			obj:setPosition(x or self.x, y or self.y)
 		end
+
+		-- Set owner
+		local owner = owner or self
+		if (owner) then obj:setOwner(owner) end
+
+		return obj
+	end;
+
+
+	-- The instigator, damageType, momentum and location are all optional.
+	--
+	takeDamage = function(self, damage, instigator, damageType, momentum, location)
+	end;
+
+	died = function(self)
+		self:destroy()
 	end;
 
 	destroy = function(self)
@@ -71,7 +87,11 @@ Actor = Object:subclass
 
 	setPosition = function(self, x, y)
 		self.x = x
-		self.h = h
+		self.y = y
+	end;
+
+	setOwner = function(self, owner)
+		self.owner = owner
 	end;
 
 
@@ -80,6 +100,8 @@ Actor = Object:subclass
 	--
 
 	defaultproperties = {
+		owner = nil,
+
 		speed = 2,
 		x = 0,
 		y = 0,

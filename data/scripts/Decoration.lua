@@ -16,9 +16,12 @@ Decoration = Actor:subclass
 			self.animInst = self.animType:new()
 			self.animInst:start(self.animSeq)
 		end
+		if (self.convTable) then
+			self.bCanActivate = true
+		end
 	end;
 
-	event_activate = function(self, instigator)
+	activatedBy = function(self, instigator)
 		if (self.convTable) then
 			n = get_new_n(self.prev_random, table.getn(self.convTable))
 			self.prev_random = n
@@ -39,6 +42,7 @@ Decoration = Actor:subclass
 		animInst = nil,
 
 		convTable = nil,
+		bCanActivate = false,
 		prev_random = -1,
 
 		obstacle = 1,

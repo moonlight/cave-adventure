@@ -95,7 +95,7 @@ ActionAddSequence = Action:subclass
 	end;
 
 	exec = function(self)
-		ActionController:addSequence(seq)
+		ActionController:addSequence(self.sequence)
 		return true
 	end;
 }

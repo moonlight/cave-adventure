@@ -57,32 +57,14 @@ function event_init()
 
 
 	-- Spawn the player
-	player = spawn(-1, -1, Player)
+	player = Actor:spawn(Player, -1, -1)
+	playerController = PlayerController()
+	playerController:possess(player)
 	m_set_player(player)
 
 	camera.target = player
 	camera_handle = m_add_object(0, 0, "CameraHandle")
 	camera_handle.travel = 1
-
-	-- Starting position
-	--m_load_map("data/maps/cave1.map")
-	--player.x = 50
-	--player.y = 4
-	--player.dir = DIR_DOWN
-
-	-- Going inside prison position
-	--m_load_map("data/maps/cave2.map")
-	--player.x = 25
-	--player.y = 13
-	--player.dir = DIR_UP
-
-	-- Boss position
-	--m_load_map("data/maps/cave3.map")
-	--player.x = 35
-	--player.y = 18
-	--player.dir = DIR_UP
-
-	--MusicControl:play_song("data/music/KR-UT2003-Menu.ogg")
 end
 
 --
@@ -90,9 +72,9 @@ end
 --
 function event_load_map(map_name)
 	m_message("event_load_map received argument: \""..map_name.."\"");
-	if (map_name == "data/maps/buiten.map") then prepare_buiten() end
-	if (map_name == "data/maps/tent1.map") then prepare_tent() end
-	if (map_name == "data/maps/bos.map") then prepare_bos() end
+	--if (map_name == "data/maps/buiten.map") then prepare_buiten() end
+	--if (map_name == "data/maps/tent1.map") then prepare_tent() end
+	--if (map_name == "data/maps/bos.map") then prepare_bos() end
 	if (map_name == "data/maps/cave1.map") then prepare_cave1() end
 	if (map_name == "data/maps/cave2.map") then prepare_cave2() end
 	if (map_name == "data/maps/cave3.map") then prepare_cave3() end
@@ -109,6 +91,11 @@ function event_logic_update()
 	ActionController:update()
 	MusicControl:update()
 	--CombatControl:update()
+
+	if (playerController and m_get_ex_mode() == 0) then
+		m_update_input(playerController)
+		playerController:playerTick()
+	end
 end
 
 

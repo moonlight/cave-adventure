@@ -2,10 +2,10 @@
 -- The player class is defined here.
 -- By Bjørn Lindeijer
 
-import("Character.lua")
+import("Pawn.lua")
 
 
-Player = Character:subclass
+Player = Pawn:subclass
 {
 	name = "Player";
 
@@ -75,10 +75,6 @@ Player = Character:subclass
 		else self.attacking = 0
 		end
 
-		if (self.state == CHR_DEAD) then
-			self:do_death()
-		end
-
 		self:update_bitmap()
 	end;
 
@@ -91,19 +87,16 @@ Player = Character:subclass
 		BasicCharAni.event_tick(self)
 	end;
 
-	take_damage = function(self, damage)
+	takeDamage = function(self, damage, instigator, damageType, momentum, location)
+		Pawn.takeDamage(self, damage, instigator, damageType, momentum, location)
 		if (damage > 0) then
-			self.health = self.health - damage
 			local obj = m_add_object(self.x, self.y, "BloodSplat")
 			obj.offset_z = obj.offset_z + 24
-
-			if (self.health <= 0) then
-				self:setState(CHR_DEAD)
-			end
 		end
 	end;
 
-	do_death = function(self)
+	died = function(self)
+		self:setState(CHR_DEAD)
 		self.animation = nil
 		self.bitmap = m_get_bitmap("frode_dead.tga")
 		ActionController:addSequence({

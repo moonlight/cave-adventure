@@ -3,9 +3,9 @@
 
 
 function prepare_cave1()
-	spawn(56, 30, Spring)
+	Actor:spawn(Spring, 56, 30)
 
-	local radio = spawn(54, 3, Radio)
+	local radio = Actor:spawn(Radio, 54, 3)
 	radio.offset_y = radio.offset_y + 5
 
 	-- Spider webs
@@ -67,18 +67,18 @@ function prepare_cave1()
 
 	-- Torches
 	-- EXPERIMENTAL CREATION OF THE TORCHES
-	spawn(51, 56, Torch)
-	spawn(58, 30, Torch)
-	spawn(53, 22, Torch)
-	spawn(22,  7, Torch)
-	spawn(29,  7, Torch)
-	spawn(20, 16, Torch)
-	spawn(29, 18, Torch)
-	spawn( 5, 56, Torch)
-	spawn(29, 63, Torch)
+	Actor:spawn(Torch, 51, 56)
+	Actor:spawn(Torch, 58, 30)
+	Actor:spawn(Torch, 53, 22)
+	Actor:spawn(Torch, 22, 7)
+	Actor:spawn(Torch, 29, 7)
+	Actor:spawn(Torch, 20, 16)
+	Actor:spawn(Torch, 29, 18)
+	Actor:spawn(Torch, 5,  56)
+	Actor:spawn(Torch, 29, 63)
 
 	-- Flowing waterfall
-	spawn(50, 3, CaveWaterfallExit)
+	Actor:spawn(CaveWaterfallExit, 50, 3)
 
 	-- Add something generating music
 	-- obj = m_add_object(54, 3, "Radio")
@@ -97,7 +97,7 @@ function prepare_cave1()
 	m_add_object(45,68,"CaveBridge2")
 
 	-- Pile of rubble
-	spawn(16, 32, CavePile)
+	Actor:spawn(CavePile, 16, 32)
 
 	-- Pick
 	m_add_object(27,8,"CavePick")
@@ -108,8 +108,8 @@ function prepare_cave1()
 end
 
 function prepare_cave2()
-	spawn(44,  7, Spring)
-	spawn(6,  42, Spring)
+	Actor:spawn(Spring, 44, 7)
+	Actor:spawn(Spring, 6, 42)
 	
 	-- Spider webs
 	m_add_object(19,  7, "SpiderWeb")
@@ -234,7 +234,7 @@ function prepare_cave2()
 end
 
 function prepare_cave3()
-	spawn(12, 12, Spring)
+	Actor:spawn(Spring, 12, 12)
 
 	-- Torches
 	m_add_object(30,  9, "Torch")
