@@ -18,7 +18,7 @@ function Rat:event_init()
 	self:start_animation(rat_anim)
 
 	self.scared = false
-	self.walk_interval = 100 + random(50)
+	self.walk_interval = 100 + math.random(50)
 end
 
 function Rat:do_death()
@@ -53,8 +53,8 @@ function Rat:event_tick()
 		if (playerDist < 5 and scared == true) then
 			self:walk(reverseDirection(playerDirection(self)))
 		elseif (self.walk_interval == 0) then
-			self:walk(random(4))
-			self.walk_interval = 100 + random(50)
+			self:walk(math.random(4))
+			self.walk_interval = 100 + math.random(50)
 		end
 	end
 

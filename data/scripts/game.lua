@@ -3,6 +3,16 @@
 -- By Bjørn Lindeijer
 
 
+game = {
+	game_over = 0,
+	game_over_alpha = 0,
+}
+
+camera = {
+	target = nil,
+}
+
+
 --
 -- This function is called once, when the game is initialized.
 --
@@ -48,7 +58,7 @@ function event_init()
 	player = m_add_object(-1, -1, "Player")
 	m_set_player(player)
 
-	camera_target = player
+	camera.target = player
 	camera_handle = m_add_object(0, 0, "CameraHandle")
 	camera_handle.travel = 1
 
@@ -131,13 +141,13 @@ function event_render()
 		m_set_cursor(82,main_start.y); draw_icon(main_start.bm)
 		m_set_drawmode(DM_MASKED)
 	else
-		m_draw_viewport((width - 320) * 0.5, (height - 240) * 0.5, 320, 240, camera_target)
+		m_draw_viewport((width - 320) * 0.5, (height - 240) * 0.5, 320, 240, camera.target)
 		--m_draw_viewport(width / 4, height / 4, width / 2, height / 2, m_get_player())
 	end
 
-	if (map_fadeout ~= nil and map_fadeout > 0) then
+	if (map_fade ~= nil and map_fade.alpha ~= nil and map_fade.alpha > 0) then
 		local w,h = m_screen_size()
-		m_set_alpha(map_fadeout)
+		m_set_alpha(map_fade.alpha)
 		m_set_cursor(0,0)
 		draw_rect(m_get_bitmap("pixel_black.bmp"), w, h)
 		m_set_alpha(255)
@@ -158,20 +168,20 @@ function write_conversation(data)
 	local conversation = {}
 
 	for index, value in data do
-		tinsert(conversation, value[1]..": \""..value[2].."\"")
+		table.insert(conversation, value[1]..": \""..value[2].."\"")
 	end
 
 	Dialog:do_dialog_sequence(conversation)
 end
 
 --
--- Another helper function to make it easier to choose a random thing to say, unequal
+-- Another helper function to make it easier to choose a math.random thing to say, unequal
 -- to what was said last time.
 --
 function get_new_n(old_n, max_n)
 	local n
 	if (max_n > 1) then
-		repeat n = random(max_n) until (n ~= old_n)
+		repeat n = math.random(max_n) until (n ~= old_n)
 	else n = max_n end
 	return n
 end

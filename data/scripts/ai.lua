@@ -22,7 +22,7 @@ function playerDistance(obj)
 	local dx = player.x - obj.x
 	local dy = player.y - obj.y
 
-	return sqrt(dx^2 + dy^2)
+	return math.sqrt(dx^2 + dy^2)
 end
 
 -- Returns the direction of the player from the
@@ -33,7 +33,7 @@ function playerDirection(obj)
 	local dx = player.x - obj.x
 	local dy = player.y - obj.y
 
-	if (abs(dx) > abs(dy)) then
+	if (math.abs(dx) > math.abs(dy)) then
 		if (dx > 0) then return DIR_RIGHT
 		else return DIR_LEFT
 		end
@@ -58,16 +58,16 @@ end
 --
 function freeTilesAround(obj)
 	dirs = {}
-	if (getn(m_get_objects_at(obj.x - 1, obj.y)) == 0) then tinsert(dirs, DIR_LEFT ) end
-	if (getn(m_get_objects_at(obj.x + 1, obj.y)) == 0) then tinsert(dirs, DIR_RIGHT) end
-	if (getn(m_get_objects_at(obj.x, obj.y - 1)) == 0) then tinsert(dirs, DIR_UP   ) end
-	if (getn(m_get_objects_at(obj.x, obj.y + 1)) == 0) then tinsert(dirs, DIR_DOWN ) end
+	if (table.getn(m_get_objects_at(obj.x - 1, obj.y)) == 0) then table.insert(dirs, DIR_LEFT ) end
+	if (table.getn(m_get_objects_at(obj.x + 1, obj.y)) == 0) then table.insert(dirs, DIR_RIGHT) end
+	if (table.getn(m_get_objects_at(obj.x, obj.y - 1)) == 0) then table.insert(dirs, DIR_UP   ) end
+	if (table.getn(m_get_objects_at(obj.x, obj.y + 1)) == 0) then table.insert(dirs, DIR_DOWN ) end
 	return dirs
 end
 
 function randomFreeTileAround(obj)
 	local dirs = freeTilesAround(obj)
-	if (getn(dirs) > 0) then return dirs[random(getn(dirs))] end
+	if (table.getn(dirs) > 0) then return dirs[math.random(table.getn(dirs))] end
 	return nil
 end
 
@@ -123,7 +123,7 @@ function CommonAI:attack(dir)
 	local player = m_get_player()
 
 	-- Handle attack (deal damage to player)
-	player:take_damage(self.attack_min_dam + random(self.attack_max_dam - self.attack_min_dam))
+	player:take_damage(self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))
 
 	-- Spawn the hitting effect (ie. sparks)
 	if (self.attack_object) then self:attack_object(player) end

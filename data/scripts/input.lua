@@ -17,7 +17,7 @@ function event_keypress(key)
 			started = 1
 			SeqControl:add_sequence({
 				ActionFadeOutMap(50),
-				ActionSetVariable(globals(), "show_main_menu", nil),
+				ActionSetVariable(_G, "show_main_menu", nil),
 				ActionChangeMap("data/maps/cave1.map"),
 				ActionSetPosition(m_get_player(), 50, 4, DIR_DOWN), -- Normal start position in cave 1
 				--ActionSetPosition(m_get_player(), 25, 15, DIR_UP), -- Just before sequence in cave 2

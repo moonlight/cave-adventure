@@ -19,7 +19,7 @@ function CaveWaterfallExit:event_activate(instigator)
 		conv.NO_ESCAPE,
 	}
 
-	n = get_new_n(self.prev_random, getn(text_table))
+	n = get_new_n(self.prev_random, table.getn(text_table))
 	self.prev_random = n
 
 	write_conversation(text_table[n])

@@ -45,12 +45,12 @@ function ActionCallFunction(f, ...)
 	me.arg = arg
 
 	function me:finished()
-		if (getn(self.arg) == 0) then self.f() end
-		if (getn(self.arg) == 1) then self.f(self.arg[1]) end
-		if (getn(self.arg) == 2) then self.f(self.arg[1], self.arg[2]) end
-		if (getn(self.arg) == 3) then self.f(self.arg[1], self.arg[2], self.arg[3]) end
-		if (getn(self.arg) == 4) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4]) end
-		if (getn(self.arg) == 5) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4], self.arg[5]) end
+		if (table.getn(self.arg) == 0) then self.f() end
+		if (table.getn(self.arg) == 1) then self.f(self.arg[1]) end
+		if (table.getn(self.arg) == 2) then self.f(self.arg[1], self.arg[2]) end
+		if (table.getn(self.arg) == 3) then self.f(self.arg[1], self.arg[2], self.arg[3]) end
+		if (table.getn(self.arg) == 4) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4]) end
+		if (table.getn(self.arg) == 5) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4], self.arg[5]) end
 		return 1
 	end
 
@@ -177,9 +177,9 @@ function ActionExModeOn()
 	local me = {}
 	me.name = "ExModeOn"
 	function me:finished()
-		tinsert(exModeArray, m_get_ex_mode())
+		table.insert(exModeArray, m_get_ex_mode())
 		m_set_ex_mode(1)
-		m_message("Exclusive mode turned on (".. getn(exModeArray) ..")")
+		m_message("Exclusive mode turned on (".. table.getn(exModeArray) ..")")
 		return 1
 	end
 	return me
@@ -189,9 +189,9 @@ function ActionExModeOff()
 	local me = {}
 	me.name = "ExModeOff"
 	function me:finished()
-		m_set_ex_mode(exModeArray[getn(exModeArray)])
-		tremove(exModeArray, getn(exModeArray))
-		m_message("Exclusive mode turned off (".. getn(exModeArray) ..")")
+		m_set_ex_mode(exModeArray[table.getn(exModeArray)])
+		table.remove(exModeArray, table.getn(exModeArray))
+		m_message("Exclusive mode turned off (".. table.getn(exModeArray) ..")")
 		return 1
 	end
 	return me
@@ -264,12 +264,14 @@ end
 
 -- Fading in and out
 
+map_fade = {alpha = 0}
+
 function ActionFadeInMap(time)
-	return ActionTweenVariable(globals(), "map_fadeout", time, 0, 255)
+	return ActionTweenVariable(map_fade, "alpha", time, 0, 255)
 end
 
 function ActionFadeOutMap(time)
-	return ActionTweenVariable(globals(), "map_fadeout", time, 255, 0)
+	return ActionTweenVariable(map_fade, "alpha", time, 255, 0)
 end
 
 

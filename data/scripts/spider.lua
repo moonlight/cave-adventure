@@ -139,7 +139,7 @@ function EnemyPoisonSpiderQueen:event_tick()
 			elseif (self.charge_birth == 0 and space) then
 				self:give_birth(space)
 			else
-				self:walk(random(4))
+				self:walk(math.random(4))
 			end
 		end
 	end
@@ -148,7 +148,7 @@ end
 function EnemyPoisonSpiderQueen:give_birth(dir)
 	local obj = m_add_object(self.x, self.y, "EnemySmallPoisonSpiderQueen")
 	obj:walk(dir)
-	self.charge_birth = 300 + random(200)
+	self.charge_birth = 300 + math.random(200)
 end
 
 function EnemyPoisonSpiderQueen:do_death()

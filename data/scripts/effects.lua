@@ -52,11 +52,11 @@ function SmallSpark:event_init()
 	self.bitmap = m_get_bitmap("spark_small.bmp")
 	self.draw_mode = DM_ADD
 	self.tick_time = 1
-	self.life_time = 50 + random(50)
+	self.life_time = 50 + math.random(50)
 
-	self.speed_x = (random(1000) / 1000 - 0.5) * 0.5
-	self.speed_y = (random(1000) / 1000 - 0.5) * 0.5
-	self.speed_z = (random(1000) / 1000 - 0.5) * 0.5
+	self.speed_x = (math.random(1000) / 1000 - 0.5) * 0.5
+	self.speed_y = (math.random(1000) / 1000 - 0.5) * 0.5
+	self.speed_z = (math.random(1000) / 1000 - 0.5) * 0.5
 
 	self.fx = 0.0
 	self.fy = 0.0

@@ -87,9 +87,9 @@ function BossAI:event_tick()
 		if (playerDist < 2) then
 			if (self.teleport_countdown == 0) then
 				-- We can teleport away, so let's do it!
-				-- Pick a random spot (TODO: make sure not close or on top of player)
-				local tx = self.area_min_x + random(self.area_max_x - self.area_min_x)
-				local ty = self.area_min_y + random(self.area_max_y - self.area_min_y)
+				-- Pick a math.random spot (TODO: make sure not close or on top of player)
+				local tx = self.area_min_x + math.random(self.area_max_x - self.area_min_x)
+				local ty = self.area_min_y + math.random(self.area_max_y - self.area_min_y)
 				-- Do the teleport sequence
 				self:setState(BAI_PHASE)
 				self.teleport_sequence = SeqControl:add_sequence({
@@ -98,7 +98,7 @@ function BossAI:event_tick()
 					ActionSetPosition(self, tx, ty),
 					ActionTweenVariable(self, "alpha", 50, 255),
 					ActionSetVariable(self, "draw_mode", DM_MASKED),
-					ActionSetVariable(self, "teleport_countdown", random(self.teleport_interval) + 100),
+					ActionSetVariable(self, "teleport_countdown", math.random(self.teleport_interval) + 100),
 					ActionSetState(self, BAI_READY),
 				})
 			else
@@ -111,7 +111,7 @@ function BossAI:event_tick()
 				self:attack(playerDirection(self))
 			else
 				-- Not charged up, hover randomly!
-				self:walk(random(4))
+				self:walk(math.random(4))
 			end
 		end
 	end
@@ -124,7 +124,7 @@ function BossAI:attack(dir)
 	local player = m_get_player()
 
 	-- Handle attack (deal damage to player)
-	player:take_damage(self.attack_min_dam + random(self.attack_max_dam - self.attack_min_dam))
+	player:take_damage(self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))
 
 	-- Spawn the hitting effect (ie. sparks)
 	if (self.attack_object) then self:attack_object(player) end

@@ -110,7 +110,7 @@ function BossFightTrigger:event_stand_on(obj)
 
 		SeqControl:add_sequence({
 			ActionExModeOn(),
-			ActionSetVariable(globals(), "camera_target", self),
+			ActionSetVariable(camera, "target", self),
 			ActionChangeDirection(player, DIR_UP),
 			ActionConversation(conv.BOSS_AFTER_PRISON),
 			ActionAddObject("EnemyBoss", static_boss.x, static_boss.y),

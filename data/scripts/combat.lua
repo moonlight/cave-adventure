@@ -66,15 +66,15 @@ function CombatControl:keypress(key)
 	elseif (self.state ~= CC_DISABLED) then
 
 		-- Get rid of remaining red circles and green dots
-		for i = 1, getn(self.redCircles) do
+		for i = 1, table.getn(self.redCircles) do
 			m_destroy_object(self.redCircles[i])
 		end
-		for i = 1, getn(self.greenDots) do
+		for i = 1, table.getn(self.greenDots) do
 			m_destroy_object(self.greenDots[i])
 		end
 
 		-- Get rid of the enemies
-		for i = 1, getn(self.enemies) do
+		for i = 1, table.getn(self.enemies) do
 			m_destroy_object(self.enemies[i])
 		end
 
@@ -117,11 +117,11 @@ function CombatControl:startCombat(friends, enemies)
 
 	-- Create red circles for all enemies
 	self.redCircles = {}
-	for i = 1, getn(self.enemies) do
+	for i = 1, table.getn(self.enemies) do
 		local circle = m_add_object(self.enemies[i].x, self.enemies[i].y, "CombatCircleRed")
 		circle.offset_x = circle.offset_x + self.enemies[i].offset_x
 		circle.offset_y = circle.offset_y + self.enemies[i].offset_y
-		tinsert(self.redCircles, circle)
+		table.insert(self.redCircles, circle)
 	end
 
 	self:setState(CC_PLAYER_TURN)
@@ -132,9 +132,9 @@ function CombatControl:startCombat(friends, enemies)
 	self.greenDots = {}
 	for x = player.x - player.speed, player.x + player.speed do
 		for y = player.y - player.speed, player.y + player.speed do
-			if (abs(player.x - x) + abs(player.y - y) <= (player.stepsLeft) and not (x == player.x and y == player.y)) then
+			if (math.abs(player.x - x) + math.abs(player.y - y) <= (player.stepsLeft) and not (x == player.x and y == player.y)) then
 				local dot = m_add_object(x, y, "CombatGreenDot")
-				tinsert(self.greenDots, dot)
+				table.insert(self.greenDots, dot)
 			end
 		end
 	end
@@ -194,13 +194,13 @@ function TestStartCombat:event_stand_on(obj)
 		local goblin
 		goblin = m_add_object(self.x + 2, self.y + 1, "Goblin")
 		goblin.dir = DIR_LEFT
-		tinsert(goblins, goblin)
+		table.insert(goblins, goblin)
 		goblin = m_add_object(self.x + 3, self.y + 2, "Goblin")
 		goblin.dir = DIR_LEFT
-		tinsert(goblins, goblin)
+		table.insert(goblins, goblin)
 		goblin = m_add_object(self.x + 5, self.y, "Goblin")
 		goblin.dir = DIR_LEFT
-		tinsert(goblins, goblin)
+		table.insert(goblins, goblin)
 		CombatControl:startCombat(goblins)
 	end
 end

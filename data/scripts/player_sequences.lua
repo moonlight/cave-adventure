@@ -67,7 +67,7 @@ function Buiten_Naar_Tent1:event_activate(instigator)
 		{{"Frode", "It's a mess inside."}},
 	}
 
-	repeat n = random(getn(text_table)) until (n ~= self.prev_random)
+	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
 	self.prev_random = n
 		
 	SeqControl:add_sequence({
@@ -88,7 +88,7 @@ function Buiten_Naar_Tent2:event_activate(instigator)
 		{{"Frode", "It's a terrible mess inside."}},
 	}
 
-	repeat n = random(getn(text_table)) until (n ~= self.prev_random)
+	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
 	self.prev_random = n
 
 	SeqControl:add_sequence({

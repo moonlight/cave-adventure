@@ -88,11 +88,11 @@ function HUD:draw()
 	m_set_alpha(255)
 
 	-- Draw gameover screen stuff
-	if (game_over and game_over_alpha and game_over_alpha > 0) then
-		m_set_alpha(0.25*game_over_alpha)
+	if (game.game_over and game.game_over_alpha and game.game_over_alpha > 0) then
+		m_set_alpha(0.25 * game.game_over_alpha)
 		m_set_cursor((self.screen_w - self.go_w)/2 + 6, (self.screen_h - self.go_h)/3 + 4)
 		draw_icon(self.game_over_s)
-		m_set_alpha(game_over_alpha)
+		m_set_alpha(game.game_over_alpha)
 		m_set_cursor((self.screen_w - self.go_w)/2, (self.screen_h - self.go_h)/3)
 		draw_icon(self.game_over)
 	end

@@ -81,7 +81,7 @@ function extr_array(bm, w, h, spacing)
 
 	for y = 0, (bh / h) - 1 do
 		for x = 0, (bw / w) - 1 do
-			tinsert(bm_array, m_create_sub_bitmap(bm, x*(w+spacing), y*(h+spacing), w, h))
+			table.insert(bm_array, m_create_sub_bitmap(bm, x*(w+spacing), y*(h+spacing), w, h))
 		end
 	end
 

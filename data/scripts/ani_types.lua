@@ -22,9 +22,9 @@ function LinearAni:stop_animation()
 	self.animation = nil
 end
 function LinearAni:update_bitmap()
-	local nr = getn(self.animation)
+	local nr = table.getn(self.animation)
 
-	if (self.animation and getn(self.animation) > 0) then
+	if (self.animation and table.getn(self.animation) > 0) then
 		self.bitmap = self.animation[self.animation_count]
 	end
 
@@ -43,8 +43,8 @@ function LinearAni:event_tick()
 end
 
 
--- RANDOM FRAME ANIMATION
--- Every tick a random bitmap is chosen.
+-- math.random FRAME ANIMATION
+-- Every tick a math.random bitmap is chosen.
 --
 RandomAni = {
 	animation = {},
@@ -60,11 +60,11 @@ function RandomAni:stop_animation()
 end
 function RandomAni:update_bitmap()
 	if (self.animation) then
-		local nr = getn(self.animation)
+		local nr = table.getn(self.animation)
 		if (nr == 1) then
 			self.bitmap = self.animation[1]
 		elseif (nr > 1) then
-			repeat n = random(nr) until n ~= self.prev_animation_frame
+			repeat n = math.random(nr) until n ~= self.prev_animation_frame
 			self.prev_animation_frame = n
 			self.bitmap = self.animation[n]
 		end
@@ -96,12 +96,12 @@ function FrameDurationAni:stop_animation()
 	self.animation = nil
 end
 function FrameDurationAni:update_bitmap()
-	if (self.animation and getn(self.animation) > 0) then
-		while (self.animation and getn(self.animation) > 0 and self.frame_count > self.animation[self.animation_count][2]) do
+	if (self.animation and table.getn(self.animation) > 0) then
+		while (self.animation and table.getn(self.animation) > 0 and self.frame_count > self.animation[self.animation_count][2]) do
 			self.frame_count = self.frame_count - self.animation[self.animation_count][2]
 			self.animation_count = self.animation_count + 1
 
-			if (self.animation_count > getn(self.animation)) then
+			if (self.animation_count > table.getn(self.animation)) then
 				self.animation_count = 1
 
 				if (self.animation_finished) then
@@ -110,7 +110,7 @@ function FrameDurationAni:update_bitmap()
 			end
 		end
 
-		if (self.animation and getn(self.animation) > 0) then
+		if (self.animation and table.getn(self.animation) > 0) then
 			self.bitmap = self.animation[self.animation_count][1]
 		end
 

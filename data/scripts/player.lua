@@ -63,7 +63,7 @@ function Player:attack()
 		local attacked_objs = m_get_objects_at(ax, ay)
 		for index, object in attacked_objs do
 			if (object.take_damage) then
-				local damage = (self.attack_min_dam + random(self.attack_max_dam - self.attack_min_dam))*(self.strength/95 + 18/19)
+				local damage = (self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))*(self.strength/95 + 18/19)
 				object:take_damage(damage)
 			end
 		end
@@ -124,9 +124,9 @@ function Player:do_death()
 	SeqControl:add_sequence({
 		ActionExModeOn(),
 		ActionWait(200),
-		ActionSetVariable(globals(), "game_over", 1),
+		ActionSetVariable(game, "game_over", 1),
 		ActionAddSequence({
-			ActionTweenVariable(globals(), "game_over_alpha", 300, 255, 0),
+			ActionTweenVariable(game, "game_over_alpha", 300, 255, 0),
 		}),
 	})
 end

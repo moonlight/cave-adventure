@@ -8,22 +8,22 @@
 
 -- Receives a single string and returns array of tokens.
 -- Ex: "Hello world!" -> {"Hello", "world!"}
-function tokenize(string)
+function tokenize(str)
 	local tokens = {}
-	local str_len = strlen(string)
+	local str_len = string.len(str)
 	local start = 1
 
 	while (start < str_len) do
-		from, to, token = strfind(string, "%s?([^%s]*)", start)
+		from, to, token = string.find(str, "%s?([^%s]*)", start)
 		start = to + 1
-		tinsert(tokens, token)
+		table.insert(tokens, token)
 	end
 
 	return tokens
 end
 
 function detokenize(tokens)
-	token_cnt = getn(tokens)
+	token_cnt = table.getn(tokens)
 
 	if (token_cnt > 0) then
 		local string = tokens[1]
@@ -48,7 +48,7 @@ end
 Dialog = {}
 
 function Dialog:do_dialog_sequence(strings)
-	local n = getn(strings)
+	local n = table.getn(strings)
 	ConvBox.lines = {}
 	ConvBox.lines_todo = {}
 	ConvBox.state = CB_CLOSED
@@ -93,13 +93,13 @@ function ConvBox:init()
 	self.y = h - h / 4
 	self.w = w / 2
 	self.h = h / 2 - h / 3 + 5 - 2
-	self.nr_lines = floor(self.h / self.line_height)
+	self.nr_lines = math.floor(self.h / self.line_height)
 	self.background_bmp = m_get_bitmap("pixel_back.bmp")
 	self.border_bmp = m_get_bitmap("pixel_border.bmp")
 end
 
 function ConvBox:write_line(string)
-	tinsert(self.lines_todo, string)
+	table.insert(self.lines_todo, string)
 	if (self.state == CB_CLOSED) then
 		self.state = CB_SCALING
 		SeqControl:add_sequence{
@@ -119,8 +119,8 @@ function ConvBox:update()
 	if (self.state == CB_CLOSED) then
 		return
 
-	elseif (self.state == CB_READY and getn(self.lines_todo) > 0) then
-		if (getn(self.lines) < self.nr_lines) then
+	elseif (self.state == CB_READY and table.getn(self.lines_todo) > 0) then
+		if (table.getn(self.lines) < self.nr_lines) then
 			-- There is space, start writing the line.
 
 			-- We need the correct font set when calculating how big the text is
@@ -128,24 +128,24 @@ function ConvBox:update()
 
 			local tokens = tokenize(self.lines_todo[1])
 			local new_line = tokens[1]
-			tremove(tokens, 1)
+			table.remove(tokens, 1)
 
-			while (getn(tokens) > 0 and m_text_size(new_line.." "..tokens[1]) < self.w) do
+			while (table.getn(tokens) > 0 and m_text_size(new_line.." "..tokens[1]) < self.w) do
 				new_line = new_line.." "..tokens[1]
-				tremove(tokens, 1)
+				table.remove(tokens, 1)
 			end
 
 			-- Continue indicates if writing should continue after this line
 			-- or if it should show a blinking square (end of sentence)
-			if (getn(tokens) > 0) then
+			if (table.getn(tokens) > 0) then
 				self.continue = 1
 				self.lines_todo[1] = detokenize(tokens)
 			else
 				self.continue = nil
-				tremove(self.lines_todo, 1)
+				table.remove(self.lines_todo, 1)
 			end
 
-			tinsert(self.lines, new_line)
+			table.insert(self.lines, new_line)
 			self.curr_char = 1
 			self.state = CB_WRITING
 		else
@@ -176,7 +176,7 @@ function ConvBox:update()
 			self.scroll = self.scroll + 1
 		else
 			for n = 1,(self.nr_lines - 1) do
-				tremove(self.lines, 1)
+				table.remove(self.lines, 1)
 			end
 
 			self.scroll = 0
@@ -184,8 +184,8 @@ function ConvBox:update()
 		end
 
 	elseif (self.state == CB_WRITING) then
-		local current_string = self.lines[getn(self.lines)]
-		local length = strlen(current_string)
+		local current_string = self.lines[table.getn(self.lines)]
+		local length = string.len(current_string)
 
 		if (self.curr_char < length) then
 			self.curr_char = self.curr_char + 0.5
@@ -237,11 +237,11 @@ function ConvBox:draw()
 	if (self.state ~= CB_SCALING) then
 		-- Draw the shadow of the text
 		m_set_clip(self.x, self.y, self.x + self.w - 1, self.y + self.h - 1)
-		for n = 1, getn(self.lines) do
+		for n = 1, table.getn(self.lines) do
 			m_set_color(0, 0, 0)
 			m_set_cursor(self.x + 1, self.y + (n - 1) * self.line_height - self.scroll + 1)
-			if (n == getn(self.lines)) then
-				m_draw_text(strsub(self.lines[n], 1, self.curr_char))
+			if (n == table.getn(self.lines)) then
+				m_draw_text(string.sub(self.lines[n], 1, self.curr_char))
 			else
 				m_draw_text(self.lines[n])
 			end
@@ -267,11 +267,11 @@ function ConvBox:draw()
 
 		-- Draw the lines of text
 		m_set_clip(self.x, self.y, self.x + self.w - 1, self.y + self.h - 1)
-		for n = 1, getn(self.lines) do
+		for n = 1, table.getn(self.lines) do
 			m_set_color(170, 170, 170)
 			m_set_cursor(self.x, self.y + (n - 1) * self.line_height - self.scroll)
-			if (n == getn(self.lines)) then
-				m_draw_text(strsub(self.lines[n], 1, self.curr_char))
+			if (n == table.getn(self.lines)) then
+				m_draw_text(string.sub(self.lines[n], 1, self.curr_char))
 			else
 				m_draw_text(self.lines[n])
 			end

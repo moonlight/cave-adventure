@@ -27,7 +27,7 @@ function Torch:event_activate(instigator)
 		conv.FIRE_3,
 	}
 
-	repeat n = random(getn(text_table)) until (n ~= self.prev_random)
+	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
 	self.prev_random = n
 
 	write_conversation(text_table[n])
