@@ -1,0 +1,139 @@
+/*
+ *  The Moonlight RPG engine  (see readme.txt about version info)
+ *  By Bjørn Lindeijer
+ *
+ ************************************************************************************/
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <allegro.h>
+#include <list>
+#include "Console.h"
+#include "RPG.h"
+#include <math.h>
+
+#ifndef M_PI
+   #define M_PI   3.14159
+#endif
+
+
+Console::Console(const char* filename)
+{
+	logFilename = new char[strlen(filename) + 1];
+	strcpy(logFilename, filename);
+	logFilename[strlen(filename)] = NULL;
+
+	logFile = fopen(logFilename, "w");
+	fclose(logFile);
+	log(CON_LOG, CON_ALWAYS, "-----\nStart of RPG log file\n-----\n");
+
+	progress = 0;
+	active = false;
+}
+
+
+Console::~Console()
+{
+	// Deallocate console string messages
+	list<char*>::iterator i;
+	while (!logMessages.empty())
+	{
+		i = logMessages.begin();
+		delete (*i);
+		logMessages.erase(i);
+	}
+
+	log(CON_LOG, CON_ALWAYS, "\n-----\nEnd of RPG log file\n-----");
+
+	delete logFilename;
+}
+
+void Console::update()
+{
+	if (active && progress < 100) progress = MIN(100, progress + 2);
+	if (!active && progress > 0) progress = MAX(0, progress - 2);
+}
+
+void Console::draw(BITMAP *dest)
+{
+	if (progress > 0) {
+		int posY = (double)(dest->h / 4) * sin(((0.5 * M_PI) / (double)100) * (double)progress) - text_height(font);
+
+		line(dest, 0, posY + text_height(font) + 1, dest->w - 1, posY + text_height(font) + 1, makecol(0,0,0));
+		set_trans_blender(0,0,0,100);
+		drawing_mode(DRAW_MODE_TRANS, NULL, 0, 0);
+		rectfill(dest, 0, 0, dest->w - 1, posY + text_height(font), makecol(0,0,0));
+		drawing_mode(DRAW_MODE_SOLID, NULL, 0, 0);
+
+		font = engine_font;
+
+		list<char*>::iterator i = logMessages.begin();
+		while (i != logMessages.end() && posY > - text_height(font))
+		{
+			textprintf(dest, font, 2, posY, makecol(200,200,200), (*i));
+			posY -= text_height(font) + 1;
+			i++;
+		}
+	}
+}
+
+bool Console::handleInput(int key)
+{
+	if ((progress == 0 || progress == 100) && key == KEY_TILDE) {
+		active = !active;
+		return true;
+	}
+	return false;
+}
+
+void Console::log(int where, int when, const char *what, ...)
+{
+	if ((when & CON_ALWAYS) || ((when & CON_DEBUG) && debug_mode) || ((when & CON_VDEBUG) && debug_mode == 2))
+	{
+		char* buf = (char*)malloc(512 * sizeof(char));
+
+		va_list ap;
+		va_start(ap, what);
+		uvsprintf(buf, what, ap);
+		va_end(ap);
+
+		if (where & (CON_LOG | CON_QUIT))
+		{
+			logFile = fopen(logFilename, "a");
+			fprintf(logFile, buf);
+			fprintf(logFile, "\n");
+			if (where & CON_QUIT)
+			{
+				fprintf(logFile, "FATAL ERROR!\n");
+				fclose(logFile);
+				set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+				allegro_message(buf);
+				exit(1);
+			}
+			fclose(logFile);
+		}
+
+		if (where & CON_POPUP)
+		{
+			allegro_message(buf);
+		}
+
+		if (where & CON_CONSOLE)
+		{
+			// Add the message to the console
+			logMessages.push_front(buf);
+
+			// Clean up the log memory (only keep the last 20 messages)
+			if (logMessages.size() > 20) {
+				free(logMessages.back());
+				logMessages.pop_back();
+			}
+		}
+		else
+		{
+			// Clean up the allocated string space
+			delete buf;
+		}
+	}
+}
+
