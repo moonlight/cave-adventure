@@ -76,6 +76,8 @@ int l_set_alpha(lua_State *L);
 int l_walk_obj(lua_State *L);
 int l_walk_obj_nocol(lua_State *L);
 
+int l_update_input(lua_State *L);
+
 
 //===================   Tag methods   ====================================================/
 

@@ -17,7 +17,6 @@
 #include "Sound.h"
 #include "Script.h"
 #include "Canvas.h"
-#include "ScriptObj.h"
 
 
 lua_State* L = NULL;
@@ -147,6 +146,8 @@ void initScripting()
 
 	lua_register(L, "m_quit_game",      l_quit_game);
 	lua_register(L, "import",           l_import);
+
+	lua_register(L, "m_update_input",   l_update_input);
 
 	handleLuaError(lua_dostring(L, lua_include), "lua_include");
 
@@ -692,6 +693,24 @@ int l_walk_obj_nocol(lua_State *L)
 	int dir;
 	getLuaArguments(L, "oi", &obj, &dir);
 	obj->walk_nocol(dir);
+	return 0;
+}
+
+
+int l_update_input(lua_State *L)
+{
+	if (lua_istable(L, 1))
+	{
+		lua_pushstring(L, "bUp");       lua_pushboolean(L, key[KEY_UP]);    lua_settable(L, -3);
+		lua_pushstring(L, "bRight");    lua_pushboolean(L, key[KEY_RIGHT]); lua_settable(L, -3);
+		lua_pushstring(L, "bDown");     lua_pushboolean(L, key[KEY_DOWN]);  lua_settable(L, -3);
+		lua_pushstring(L, "bLeft");     lua_pushboolean(L, key[KEY_LEFT]);  lua_settable(L, -3);
+		lua_pushstring(L, "bActivate"); lua_pushboolean(L, key[KEY_SPACE]); lua_settable(L, -3);
+		lua_pushstring(L, "bAttack");   lua_pushboolean(L, key_shifts & KB_CTRL_FLAG); lua_settable(L, -3);
+		lua_settop(L, 1);
+		return 1;
+	}
+	lua_settop(L, 0);
 	return 0;
 }
 

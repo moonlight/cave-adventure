@@ -12,6 +12,7 @@
 #ifndef _INCLUDED_SOUND_H_
 #define _INCLUDED_SOUND_H_
 
+#include <allegro.h>
 #include <alogg.h>
 #include "Script.h"
 

@@ -229,48 +229,8 @@ void handle_input()
 	else {
 		inkey = 0;
 	}
-
-	if (player && !exclusive_mode) {
-		/* Normal player control, means:
-		 *  - Arrow keys move player around, with collision checking
-		 *  - Action key (space) will check for an object in front of the
-		 *    player if the player is not walking. When an object is present
-		 *    its activate event will be called.
-		 *  - Ctrl is passed to the scripts as 'attack' 
-		 */
-
-		if (key[KEY_UP]    && player->walking == 0) { player->walk(DIR_UP); }
-		if (key[KEY_LEFT]  && player->walking == 0) { player->walk(DIR_LEFT); }
-		if (key[KEY_RIGHT] && player->walking == 0) { player->walk(DIR_RIGHT); }
-		if (key[KEY_DOWN]  && player->walking == 0) { player->walk(DIR_DOWN); }
-
-		if (inkey == KEY_SPACE && player->walking == 0) {
-			int pos_x = player->x;
-			int pos_y = player->y;
-
-			switch (player->dir) {
-			case DIR_UP:    pos_y -= 1; break;
-			case DIR_DOWN:  pos_y += 1; break;
-			case DIR_LEFT:  pos_x -= 1; break;
-			case DIR_RIGHT: pos_x += 1; break;
-			}
-
-			list<Object*>::iterator i;
-			for (i = objects.begin(); i != objects.end(); i++) {
-				Object *obj = (*i);
-				if ((obj->x + obj->w > pos_x && obj->x <= pos_x) &&
-					(obj->y - obj->h < pos_y && obj->y >= pos_y)) {
-					callMemberFunction(obj->tableRef, "event_activate", "o", player);
-				}
-			}
-		}
-
-		if (key_shifts & KB_CTRL_FLAG)
-		{
-			callFunction("event_keypress", "s", "attack");
-		}
-	}
-	else if (inkey > 0)
+	
+	if ((!player || exclusive_mode) && inkey > 0)
 	{
 		char *key_name = "anykey";
 
