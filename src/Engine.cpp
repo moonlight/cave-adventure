@@ -38,14 +38,14 @@ const char Object::className[16] = "Object";
 int Object::id_counter = 0;
 
 Object::Object(int luaTableRef):
+	_destroy(0),
 	walking(0), speed(0), dir(0), prev_dir(0),
 	count(0), tick(0),
 	bitmap(NULL),
 	x(0), y(0), w(1), h(1), obstacle(0),
 	offset_x(0), offset_y(0), offset_z(0),
-	_destroy(0),
-	tableRef(luaTableRef),
-	travel(0)
+	travel(0),
+	tableRef(luaTableRef)
 {
 	id = ++id_counter;
 
@@ -65,14 +65,14 @@ Object::Object(int luaTableRef):
 }
 
 Object::Object(lua_State *L):
+	_destroy(0),
 	walking(0), speed(0), dir(0), prev_dir(0),
 	count(0), tick(0),
 	bitmap(NULL),
 	x(0), y(0), w(1), h(1), obstacle(0),
 	offset_x(0), offset_y(0), offset_z(0),
-	_destroy(0),
-	tableRef(0),
-	travel(0)
+	travel(0),
+	tableRef(0)
 {
 	id = ++id_counter;
 
@@ -283,7 +283,7 @@ void Object::update_entity()
 int Object::walk(lua_State *L)
 {
 	lua_settop(L, 2);
-	int dir = luaL_checknumber(L, 1);
+	int dir = luaL_checkint(L, 1);
 	if (!lua_isnumber(L, 2) || !lua_tonumber(L, 2)) {
 		walk_nocol(dir);
 	} else {
@@ -449,7 +449,6 @@ void import_tile_bmp(const char* filename, int tiles_w, int tiles_h, int tile_sp
 {
 	console.log(CON_CONSOLE, CON_DEBUG, "Importing tile bitmap \"%s\"...", filename);
 
-	PALETTE pal;
 	BITMAP* tileBitmap;
 	char tempFilename[256];
 	DATAFILE *found_object = find_datafile_object(bitmap_data, filename);
@@ -676,3 +675,4 @@ void quit_game()
 {
 	game_end = true;
 }
+

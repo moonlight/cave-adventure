@@ -193,3 +193,4 @@ void Canvas::drawViewport(int x, int y, int w, int h, Object* cameraTarget)
 
 	tiledMap->draw(buffer);
 }
+

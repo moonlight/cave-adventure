@@ -435,9 +435,9 @@ Tile *TiledMapLayer::getTile(Point tile)
 //  Defines a generic tiled map interface and data model.
 
 TiledMap::TiledMap():
+	nrLayers(2),
 	mapWidth(0),
-	mapHeight(0),
-	nrLayers(2)
+	mapHeight(0)
 {
 	mapLayers[0] = new TiledMapLayer();
 	mapLayers[1] = new TiledMapLayer();
@@ -500,7 +500,7 @@ void TiledMap::loadFrom(PACKFILE *file, TileRepository *tileRepository)
 	ASSERT(file);
 
 	// Load the map header
-	int version = pack_igetw(file);
+	/*int version = */pack_igetw(file);
 	int layers = pack_igetw(file);
 
 	// Load the tile data
@@ -517,16 +517,9 @@ void TiledMap::loadFromOld(PACKFILE *file, TileRepository *tileRepository)
 {
 	ASSERT(file);
 
-	// Load the map header
-	int version = 1;
-	int layers = 1;
-
 	// Load the tile data
-	//allegro_message("Loading %d layers from map version %d", layers, version);
-	for (int i = 0; i < layers; i++) {
-		mapLayers[i]->loadFrom(file, tileRepository);
-	}
-
+	mapLayers[0]->loadFrom(file, tileRepository);
+	
 	mapWidth = mapLayers[0]->getWidth();
 	mapHeight = mapLayers[0]->getHeight();
 
@@ -885,3 +878,4 @@ Point IsometricMap::getMapSize()
 	);
 }
 */
+

@@ -37,45 +37,43 @@ class Object
 
 public:
 	int _destroy;						// Object will be destroyed during next update.
-	BITMAP* bitmap;
+	int walking, speed;
+	int dir, prev_dir;
 	int count, tick;
-	int speed;
-	int offset_x, offset_y, offset_z;
+	BITMAP* bitmap;
+	int x, y, w, h;
 	int obstacle;						// Object is an obstacle to other objects.
-	int id;
-	int prev_dir;
-
-	int x, y, w, h, dir;
-	int tableRef;						// A reference to the associated Lua table
-	int walking;
+	int offset_x, offset_y, offset_z;
 	int travel;							// Object remains when switching maps.
+	int id;
+	int tableRef;						// A reference to the associated Lua table
 	Entity* entity;						// A pointer to the associated map entity
 
 
 	// Lua getters and setters
 	int getid(lua_State *L) { lua_pushnumber(L, id); return 1; }
 	int getspeed(lua_State *L) { lua_pushnumber(L, speed); return 1; }
-	int setspeed(lua_State *L) { x = luaL_checknumber(L, 1); return 0; }
+	int setspeed(lua_State *L) { speed = luaL_checkint(L, 1); return 0; }
 	int getobstacle(lua_State *L) { lua_pushnumber(L, obstacle); return 1; }
-	int setobstacle(lua_State *L) { obstacle = luaL_checknumber(L, 1); return 0; }
+	int setobstacle(lua_State *L) { obstacle = luaL_checkint(L, 1); return 0; }
 	int gettick(lua_State *L) { lua_pushnumber(L, tick); return 1; }
 	int settick(lua_State *L) { tick = luaL_checkint(L, 1); return 0; }
 	int gettravel(lua_State *L) { lua_pushnumber(L, travel); return 1; }
 	int settravel(lua_State *L) { travel = luaL_checkint(L, 1); return 0; }
 	int getx(lua_State *L) { lua_pushnumber(L, x); return 1; }
-	int setx(lua_State *L) { x = luaL_checknumber(L, 1); return 0; }
+	int setx(lua_State *L) { x = luaL_checkint(L, 1); return 0; }
 	int gety(lua_State *L) { lua_pushnumber(L, y); return 1; }
-	int sety(lua_State *L) { y = luaL_checknumber(L, 1); return 0; }
+	int sety(lua_State *L) { y = luaL_checkint(L, 1); return 0; }
 	int getw(lua_State *L) { lua_pushnumber(L, w); return 1; }
-	int setw(lua_State *L) { w = luaL_checknumber(L, 1); return 0; }
+	int setw(lua_State *L) { w = luaL_checkint(L, 1); return 0; }
 	int geth(lua_State *L) { lua_pushnumber(L, h); return 1; }
-	int seth(lua_State *L) { h = luaL_checknumber(L, 1); return 0; }
+	int seth(lua_State *L) { h = luaL_checkint(L, 1); return 0; }
 	int getoffset_x(lua_State *L) { lua_pushnumber(L, offset_x); return 1; }
-	int setoffset_x(lua_State *L) { offset_x = luaL_checknumber(L, 1); return 0; }
+	int setoffset_x(lua_State *L) { offset_x = luaL_checkint(L, 1); return 0; }
 	int getoffset_y(lua_State *L) { lua_pushnumber(L, offset_y); return 1; }
-	int setoffset_y(lua_State *L) { offset_y = luaL_checknumber(L, 1); return 0; }
+	int setoffset_y(lua_State *L) { offset_y = luaL_checkint(L, 1); return 0; }
 	int getoffset_z(lua_State *L) { lua_pushnumber(L, offset_z); return 1; }
-	int setoffset_z(lua_State *L) { offset_z = luaL_checknumber(L, 1); return 0; }
+	int setoffset_z(lua_State *L) { offset_z = luaL_checkint(L, 1); return 0; }
 	int setbitmap(lua_State *L) { bitmap = (BITMAP*)lua_touserdata(L, -1); return 0; }
 	int getbitmap(lua_State *L) { lua_pushlightuserdata(L, bitmap); return 1; }
 

@@ -26,7 +26,7 @@ Console::Console(const char* filename)
 {
 	logFilename = new char[strlen(filename) + 1];
 	strcpy(logFilename, filename);
-	logFilename[strlen(filename)] = NULL;
+	logFilename[strlen(filename)] = '\0';
 
 	logFile = fopen(logFilename, "w");
 	fclose(logFile);
@@ -62,7 +62,7 @@ void Console::update()
 void Console::draw(BITMAP *dest)
 {
 	if (progress > 0) {
-		int posY = (double)(dest->h / 4) * sin(((0.5 * M_PI) / (double)100) * (double)progress) - text_height(font);
+		int posY = (int)((double)(dest->h / 4) * sin(((0.5 * M_PI) / (double)100) * (double)progress) - text_height(font));
 
 		line(dest, 0, posY + text_height(font) + 1, dest->w - 1, posY + text_height(font) + 1, makecol(0,0,0));
 		set_trans_blender(0,0,0,100);

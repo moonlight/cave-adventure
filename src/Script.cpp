@@ -172,10 +172,8 @@ void initScripting()
 	// Load all scripts
 	console.log(CON_LOG, CON_ALWAYS, "Loading scripts...");
 
-	int i, j;
-	DATAFILE_PROPERTY *prop;
+	int i;
 	const char* name;
-	char tmp[256];
 
 	for (i = 0; bitmap_data[i].type != DAT_END; i++) {
 		name = get_datafile_property(bitmap_data+i, DAT_NAME);
@@ -184,23 +182,6 @@ void initScripting()
 			import(name);
 		}
 	}
-
-
-	/*
-	char searchstr[256] = "scripts/*.lua";
-	char foundfile[256];
-	al_ffblk finfo;
-
-	fix_filename_slashes(searchstr);
-
-	for (int i = al_findfirst(searchstr, &finfo, FA_ARCH); i == 0; i = al_findnext(&finfo))
-	{
-		console.log(CON_LOG, CON_ALWAYS, "> \"%s\"", finfo.name);
-
-		replace_filename(foundfile, searchstr, finfo.name, 256);
-		handleLuaError(lua_dofile(L, foundfile), foundfile);
-	}
-	*/
 }
 
 void exitScripting()

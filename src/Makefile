@@ -6,8 +6,8 @@
 #   run "make clean" to clean up the object files
 #
 
-CC = g++
-CPPFLAGS = -Wall -O3
+CC = gcc
+CPPFLAGS = -Wall -O3 -D__GTHREAD_HIDE_WIN32API
 
 
 default: install_exes
@@ -20,14 +20,14 @@ install_exes: ..//RPG.exe
 
 
 ..//RPG.exe : RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o
-	$(CC) $(CPPFLAGS) -o ..//RPG.exe RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o -lalleg -llua -llualib
+	$(CC) $(CPPFLAGS) -o ..//RPG.exe RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o -lalleg -llua -llualib -lalogg
 
 
 RPG.o         : RPG.cpp Console.h TiledMap.h Engine.h Script.h
 
 TiledMap.o    : TiledMap.cpp TiledMap.h
 
-Engine.o      : Engine.cpp Engine.h DRS.h GUI.h Console.h tiledmap.h RPG.h
+Engine.o      : Engine.cpp Engine.h Console.h TiledMap.h RPG.h
 
 Sound.o       : Sound.cpp Sound.h
 
