@@ -1,8 +1,9 @@
 --
 -- A base class for anything that walks like a character
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
 import("Actor.lua")
+import("BloodSplat.lua")
 
 
 Pawn = Actor:subclass
@@ -17,6 +18,8 @@ Pawn = Actor:subclass
 			self.controller = self.controllerClass()
 			self.controller:possess(self)
 		end
+
+		Actor.init(self)
 	end;
 
 	tick = function(self)
@@ -25,6 +28,7 @@ Pawn = Actor:subclass
 			self.controller:tick()
 		end
 	end;
+
 
 
 	--== BEING POSSESSED ==--
@@ -41,21 +45,28 @@ Pawn = Actor:subclass
 	--== TAKING DAMAGE ==--
 
 	takeDamage = function(self, damage, instigator, damageType, momentum, location)
+		self:log("takes "..damage.." damage")
 		if (damage > 0) then
 			local actualDamage = damage
-			self.health = self.health - damage
+			self.health = self.health - actualDamage
 
-			if (self.health <= 0) then
+			-- Some blood flying around maybe?
+			if (not self.bDead and self.hitEffectClass) then
+				local obj = self:spawn(self.hitEffectClass, self.x, self.y)
+				obj.offset_z = obj.offset_z + self.hitEffectHeight
+			end
+
+			-- A scream perhaps?
+			if (table.getn(self.hitSounds) > 0) then
+				local sampleFile = self.hitSounds[math.random(table.getn(self.hitSounds))]
+				m_play_sample(sampleFile)
+			end
+
+			if (self.health <= 0 and not self.bDead) then
 				-- Pawn died
-				local killer
-				if (instigator) then
-					killer = instigator.controller
-				end
-				self:died(killer, damageType, location)
-			else
-				if (self.controller) then
-					self.controller:notifyTakeDamage(actualDamage, instigator, damageType, momentum, location);
-				end
+				self:died(instigator, damageType, location)
+			elseif (self.controller) then
+				self.controller:notifyTakeDamage(actualDamage, instigator, damageType, momentum, location);
 			end
 
 			self:makeNoise(15)
@@ -63,6 +74,7 @@ Pawn = Actor:subclass
 	end;
 
 	died = function(self, killer, damageType, location)
+		self.bDead = true
 		-- Become bleeding body and fade away (implement in subclass)
 	end;
 
@@ -82,32 +94,74 @@ Pawn = Actor:subclass
 		end
 	end;
 
+	-- Ask this pawn to move away, he'll move away if possible
+	moveAway = function(self)
+		if (not self.bSleeping and self.walking == 0) then
+			local dir = self:randomFreeTileAround()
+			if (dir) then
+				self:walk(dir)
+			end
+		end
+	end;
+
+
 	attack = function(self)
 		-- Implement in subclass
 	end;
 
 	-- Making noise will cause surrounding Pawns to hear the noise with
-	--  hearedLoudness = max(0.1, loudness / (distanceInTiles ^ 2))
+	--  hearedLoudness = max(0.1, min(loudness, loudness / (distanceInTiles ^ 2)))
 	makeNoise = function(self, loudness)
+		m_make_noise(self, loudness)
 	end;
 
 	hearNoise = function(self, loudness, noiseMaker)
+		--self:log("Heared noise with loudness "..loudness.." from "..noiseMaker:toString())
 		if (self.controller) then
-			self.controller:notifyHearNoise(loadness, noiseMaker)
+			self.controller:notifyHearNoise(loudness, noiseMaker)
+		end
+	end;
+
+	-- This actor bumps into an obstacle
+	event_bump_into = function(self, obj)
+		if (self.controller) then
+			self.controller:notifyBumpInto(obj)
+		end
+	end;
+
+	-- Another actor bumps into this actor
+	event_bumped_into = function(self, obj)
+		if (self.controller) then
+			self.controller:notifyBumpedInto(obj)
+		end
+	end;
+
+	-- This actor finishes its current walking step
+	event_walk_finished = function(self)
+		if (self.controller) then
+			self.controller:notifyWalkFinished(obj)
 		end
 	end;
 
 
 	defaultproperties = {
+		bSleeping = false,
+		bDead = false,
+
 		-- The Controller possessing this Pawn
 		controller = nil,
 
 		maxHealth = 100,
 		speed = 3,
-		offset_y = -6,
+		--offset_y = -6,
 		draw_mode = DM_ALPHA,
 		obstacle = 1,
+		bCenterBitmap = true,
 
+		hitSounds = {},
+		hitEffectClass = BloodSplat,
+		hitEffectHeight = 24,
 		controllerClass = nil,
+		bCenterOnTile = true,
 	};
 }

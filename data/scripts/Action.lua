@@ -3,40 +3,41 @@
 -- could be used in a sequence. Feel free to define more specific
 -- actions for your own sequences.
 --
--- All actions have a finished() function indicating whether they
--- are finished. Non-instant actions also have an exec() function
--- that will be called every game tick until their finished()
--- function returns 1.
+-- All actions have an exec() function that will be called every
+-- game tick until it has returned true.
 --
 -- A summaration of the available action types follows:
 --
 --   ActionSequence(sequence)
+--   ActionParallel(sequence)
 --   ActionAddSequence(sequence)
 --   ActionCallFunction(f, ...)
 --   ActionSetVariable(table, key, value)
---   ActionTweenVariable(table, key, time, to [, from])
+--   ActionTweenVariable(table, key, time, to [, from, func])
 --   ActionWait(duration)
 --
 --   ActionChangeBitmap(actor, bitmap)
 --   ActionChangeDirection(actor, new_direction)
 --   ActionWalk(actor, direction, amount [,col])
+--   ActionWalkPath(actor, path [,col])
 --   ActionConversation(conversation)
 --   ActionExModeOn()
 --   ActionExModeOff()
 --   ActionPlaySong(filename, fadeTime [, wait])
+--   ActionPlaySample(filename)
 --   ActionFadeOutMusic(fadeTime [, wait])
 --   ActionFadeInMusic(filename, fadeTime [, wait])
 --   ActionFadeInMap(time)
 --   ActionFadeOutMap(time)
 --   ActionSetState(object, state)
---   ActionSetPosition(actor, x, y [, dir])
---   ActionChangeMap(filename)
+--   ActionSetPosition(actor, x, y [,dir[,map]])
 --   ActionDestroyObject(object)
 --   ActionAddObject({name|class}, x, y)
 --   ActionQuitGame()
 --   ActionShowMapName(bitmap)
+--   ActionSetCameraTarget(target [, tween])
 --
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
 
 import("Object.lua")
@@ -50,7 +51,7 @@ Action = Object:subclass
 	init = function(self) end;
 
 	-- The exec function will be called every game tick until it returns true.
-	exec = function(self) end;
+	exec = function(self) return true; end;
 }
 
 
@@ -83,6 +84,45 @@ ActionSequence = Action:subclass
 	end;
 }
 
+ActionParallel = Action:subclass
+{
+	name = "ActionParallel";
+
+	init = function(self, actions)
+		m_message("ActionParallel initializing with ".. table.getn(actions) .." actions.")
+		self.actions = {}
+
+		-- Add all actions to the list of actions to execute.
+		local i
+		for i = 1, table.getn(actions) do
+			if (actions[i] and actions[i]:instanceOf(Action)) then
+				-- Create an action execution environment for this action
+				local execEnv = {}
+				setmetatable(execEnv, {__index = actions[i]})
+
+				-- Insert the action execution environment in the actions array
+				table.insert(self.actions, execEnv)
+			else
+				m_message("ActionParallel: action not an instance of Action (".. actions[i].name ..")")
+			end
+		end
+	end;
+
+	exec = function(self)
+		local i
+
+		-- Execute all running actions
+		for i = 1, table.getn(self.actions) do
+			if (i <= table.getn(self.actions) and self.actions[i]:exec()) then
+				m_message("ActionParallel finished executing "..self.actions[i].name)
+				table.remove(self.actions, i)
+				i = i - 1
+			end
+		end
+
+		return table.getn(self.actions) == 0
+	end;
+}
 
 -- Add a sequence to the sequence controller
 
@@ -113,7 +153,7 @@ ActionCallFunction = Action:subclass
 	end;
 
 	exec = function(self)
-		self.f(expand(self.arg))
+		self.f(unpack(self.arg))
 		return true
 	end;
 }
@@ -144,24 +184,32 @@ ActionTweenVariable = Action:subclass
 {
 	name = "ActionTweenVariable";
 
-	init = function(self, table, key, time, to, from)
+	init = function(self, table, key, time, to, from, func)
 		self.table = table
 		self.key = key
 		self.time = time
 		self.to = to
-		self.from = from
+		if (type(from) == "number")   then self.from = from end
+		if (type(from) == "function") then self.func = from end
+		if (type(func) == "function") then self.func = func end
+		if (not self.func) then
+			self.func = function(from, to, perc)
+				return from + perc * (to - from)
+			end
+		end
 
 		self.count = 0
 	end;
 	
 	exec = function(self)
 		if (not self.from) then self.from = self.table[self.key] end
-
+		if (not self.from) then return true end
+		
 		self.count = self.count + 1
 		if (self.count <= self.time) then
-			self.table[self.key] = self.from + ((self.count / self.time) * (self.to - self.from))
+			self.table[self.key] = self.func(self.from, self.to, (self.count / self.time))
 		else
-			self.table[self.key] = self.to
+			self.table[self.key] = self.func(self.from, self.to, 1)
 		end
 
 		return (self.count > self.time)
@@ -218,7 +266,8 @@ ActionWalk = Action:subclass
 		self.object = object
 		self.direction = direction
 		self.amount = amount
-		self.col = (col ~= nil and col ~= 0)
+		self.col = col
+		if (col == 0) then self.col = false end
 	end;
 
 	exec = function(self)
@@ -234,6 +283,37 @@ ActionWalk = Action:subclass
 		return (self.object.walking == 0 and self.amount == 0)
 	end;
 }
+
+
+-- Order characters around using a path string
+
+ActionWalkPath = ActionSequence:subclass
+{
+	name = "ActionWalkPath";
+
+	init = function(self, object, path, col)
+		if (type(object) ~= "table") then error("Invalid object passed to ActionWalkPath") end
+		if (type(path)  ~= "string") then error("Invalid string passed to ActionWalkPath") end
+
+		self.actions = {}
+
+		for w in string.gfind(path, "[UDLR]%d*") do
+			local dir = string.sub(w,1,1)
+			if (dir == "U") then dir = DIR_UP    end
+			if (dir == "R") then dir = DIR_RIGHT end
+			if (dir == "D") then dir = DIR_DOWN  end
+			if (dir == "L") then dir = DIR_LEFT  end
+
+			local amount = tonumber(string.sub(w,2))
+			if (not amount or amount == 0) then amount = 1 end
+
+			table.insert(self.actions, ActionWalk(object, dir, amount, col))
+		end
+
+		self.i = 1
+	end;
+}
+
 
 
 -- Show conversations within a sequence
@@ -252,7 +332,7 @@ ActionConversation = Action:subclass
 			write_conversation(self.conversation)
 			self.started = true
 		end
-		return (ConvBox.state == CB_CLOSED and self.started)
+		return (convBox.state == CB_CLOSED and self.started)
 	end;
 }
 
@@ -282,24 +362,9 @@ ActionExModeOff = Action:subclass
 			m_set_ex_mode(exModeArray[table.getn(exModeArray)])
 			table.remove(exModeArray, table.getn(exModeArray))
 			--m_message("Exclusive mode turned off (".. table.getn(exModeArray) ..")")
+		else
+			m_set_ex_mode(0)
 		end
-		return true
-	end;
-}
-
-
--- Change to another map
-
-ActionChangeMap = Action:subclass
-{
-	name = "ActionChangeMap";
-	
-	init = function(self, filename)
-		self.filename = filename
-	end;
-
-	exec = function(self)
-		m_load_map(self.filename)
 		return true
 	end;
 }
@@ -332,19 +397,22 @@ ActionSetPosition = Action:subclass
 {
 	name = "ActionSetPosition";
 
-	init = function(self, obj, x, y, dir)
+	init = function(self, obj, x, y, dir, map)
 		self.x = x
 		self.y = y
 		self.dir = dir
 		self.obj = obj
+		self.map = map
 	end;
 
 	exec = function(self)
-		self.obj.x = self.x
-		self.obj.y = self.y
+		self.obj:setPosition(self.x, self.y)
 
-		if self.dir ~= nil then
+		if (self.dir) then
 			self.obj.dir = self.dir
+			if (self.map) then
+				self.obj:setMap(self.map)
+			end
 		end
 
 		return true
@@ -372,6 +440,18 @@ ActionPlaySong = Action:subclass
 			self.playingStarted = true
 		end
 		return (MusicControl.state == MC_NORMAL or (not self.wait))
+	end;
+}
+
+ActionPlaySample = ActionCallFunction:subclass
+{
+	name = "ActionPlaySample";
+
+	init = function(self, filename)
+		if (not filename) then
+			error("Error: ActionPlaySample created without a filename")
+		end
+		ActionCallFunction.init(self, m_play_sample, filename)
 	end;
 }
 
@@ -473,7 +553,7 @@ ActionAddObject = Action:subclass
 		if (type(self.objname) == "string") then
 			m_add_object(self.x, self.y, self.objname)
 		else
-			spawn(self.x, self.y, self.objname)
+			Actor:spawn(self.objname, self.x, self.y)
 		end
 		return true
 	end;
@@ -502,22 +582,43 @@ ActionShowMapName = Action:subclass
 	name = "ActionShowMapName";
 
 	init = function(self, bitmap)
+		if (not bitmap) then
+			self:log("Warning: no valid bitmap for showing map name!")
+		end
 		self.bitmap = bitmap
 	end;
 
 	exec = function(self)
-		-- Make sure no other ActionShowMapName sequence is taking place
-		ActionController:removeSequence(show_map_seq)
+		--[[
+		local mapInt = BBRpgMapname()
 
-		-- Start a new
+		mapInt.bitmap = self.bitmap
+
 		show_map_seq = ActionController:addSequence{
-			ActionWait(50),
-			ActionSetVariable(HUD, "map_name", self.bitmap),
-			ActionTweenVariable(HUD, "map_name_alpha", 100, 255, 0),
-			ActionWait(200),
-			ActionTweenVariable(HUD, "map_name_alpha", 100, 0, 255),
+			ActionCallFunction(interactionMaster.addInteraction, interactionMaster, mapInt),
+			ActionTweenVariable(mapInt, "perc", 50, 1, 0),
+			ActionWait(100),
+			ActionTweenVariable(mapInt, "perc", 50, 0, 1),
+			ActionCallFunction(interactionMaster.removeInteraction, interactionMaster, mapInt),
 		}
+]]
 
+		return true
+	end;
+}
+
+
+ActionSetCameraTarget = Action:subclass
+{
+	name = "ActionSetCameraTarget";
+
+	init = function(self, target, tween)
+		self.target = target
+		self.tween = tween
+	end;
+
+	exec = function(self)
+		gameCameraTarget:setTarget(self.target, self.tween)
 		return true
 	end;
 }
