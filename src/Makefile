@@ -1,13 +1,14 @@
 #
 #  RPG makefile
 #
-#   run "make" to compile the RPG and RPG Edit
-#   run "make remake" to recompile everything
+#   run "make" to compile the RPG
+#   run "make remake" to recompile the RPG
 #   run "make clean" to clean up the object files
 #
 
-CC = gcc
+CC = g++
 CPPFLAGS = -Wall -O3 -D__GTHREAD_HIDE_WIN32API
+LIBS = `allegro-config --libs` -llua -llualib -lalogg
 
 
 default: install_exes
@@ -20,7 +21,8 @@ install_exes: ..//RPG.exe
 
 
 ..//RPG.exe : RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o
-	$(CC) $(CPPFLAGS) -o ..//RPG.exe RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o -lalleg -llua -llualib -lalogg
+	$(CC) $(CPPFLAGS) -o ..//RPG.exe RPG.o Console.o Canvas.o TiledMap.o Engine.o Sound.o Script.o $(LIBS)
+
 
 
 RPG.o         : RPG.cpp Console.h TiledMap.h Engine.h Script.h

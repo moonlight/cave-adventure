@@ -118,10 +118,13 @@ void init_engine()
 	sound_enabled = (get_config_int("Sound", "EnableMusic", 1)) ? 1 : 0;
 
 	// Screen initialisation
-	int width, height, colordepth;
+	int width, height, colordepth = 0;
 	width = get_config_int("Engine", "ResolutionWidth", 640);
 	height = get_config_int("Engine", "ResolutionHeight", 480);
-	colordepth = get_config_int("Engine", "ColorDepth", 16);
+
+	if (driver == GFX_AUTODETECT_FULLSCREEN) {colordepth = desktop_color_depth();}
+	if (colordepth == 0) {colordepth = 16;}
+	colordepth = get_config_int("Engine", "ColorDepth", colordepth);
 
 	bDoubleSize = get_config_int("Engine", "DoubleSize", 0);
 	if (bDoubleSize) {

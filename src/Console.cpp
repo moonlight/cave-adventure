@@ -84,7 +84,7 @@ void Console::draw(BITMAP *dest)
 
 bool Console::handleInput(int key)
 {
-	if ((progress == 0 || progress == 100) && key == KEY_TILDE) {
+	if ((progress == 0 || progress == 100) && (key == KEY_TILDE || key == KEY_C)) {
 		active = !active;
 		return true;
 	}
