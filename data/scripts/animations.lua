@@ -9,25 +9,10 @@
 --
 function add_animations()
 	-- Characteranimations
-	frode_anim   = extr_char_anim(m_get_bitmap("frode.tga"))
 	caveman_anim = extr_char_anim(m_get_bitmap("caveman.bmp"))
-	spider_anim  = extr_char_anim(m_get_bitmap("spider.bmp"), 24, 24)
-	spider2_anim  = extr_char_anim(m_get_bitmap("spider2.bmp"), 24, 24)
-	spider3_anim  = extr_char_anim(m_get_bitmap("spider3.bmp"), 24, 24)
-	spider_small_anim  = extr_char_anim(m_get_bitmap("spider_small.bmp"), 16, 16)
 	caveman_slave_anim = extr_char_anim(m_get_bitmap("caveman_slave.bmp"))
-	rat_anim           = extr_char_anim(m_get_bitmap("rat.bmp"), 16, 16)
-
-	player_anim = frode_anim
-
-	-- Other animations
-	blood_splat_anim = extr_array(m_get_bitmap("blood_splat.bmp"), 16, 16)
-	blood_splat_green_anim = extr_array(m_get_bitmap("blood_splat_green.bmp"), 16, 16)
-	blood_splat_yellow_anim = extr_array(m_get_bitmap("blood_splat_yellow.bmp"), 16, 16)
+	rat_anim = extr_char_anim(m_get_bitmap("rat.bmp"), 16, 16)
 end
-
--- A global array for animation storage
-anims = {}
 
 
 --

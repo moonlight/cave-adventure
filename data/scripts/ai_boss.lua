@@ -57,7 +57,7 @@ function BossAI:event_destroyed()
 	m_destroy_object(self.shadow)
 end
 
-function BossAI:event_tick()
+function BossAI:tick()
 	-- Hover up
 	if (self.count_z < self.goal_z) then self.count_z = self.count_z + 0.1 end
 	if (self.count_z > self.goal_z) then self.count_z = self.count_z - 0.1 end

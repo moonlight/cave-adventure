@@ -4,7 +4,6 @@
 -- By Bjørn Lindeijer
 
 import("Actor.lua")
-import("Animation.lua")
 
 
 Decoration = Actor:subclass
@@ -12,10 +11,10 @@ Decoration = Actor:subclass
 	name = "Decoration";
 
 	init = function(self)
-		if (self.animType) then
-			self.animInst = self.animType:new()
-			self.animInst:start(self.animSeq)
+		if (self.animType and self.animSeq) then
+			self:loopAnim(self.animType:new(self.animSeq), self.animSpeed)
 		end
+
 		if (self.convTable) then
 			self.bCanActivate = true
 		end
@@ -29,17 +28,18 @@ Decoration = Actor:subclass
 		end
 	end;
 
-	event_tick = function(self)
+	--[[
+	tick = function(self)
 		if (self.animInst) then
 			self.animInst:update()
 			self.bitmap = self.animInst.bitmap
 		end
 	end;
+	]]
 
 	defaultproperties = {
-		animType = nil,
 		animSeq = nil,
-		animInst = nil,
+		tick_time = 1,
 
 		convTable = nil,
 		bCanActivate = false,

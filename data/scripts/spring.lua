@@ -3,6 +3,7 @@
 --
 
 import("Decoration.lua")
+import("Animation.lua")
 import("lang.lua")
 
 
@@ -10,8 +11,8 @@ Spring = Decoration:subclass
 {
 	name = "Spring";
 
-	event_activate = function(self, instigator)
-		Decoration.event_activate(self, instigator)
+	activatedBy = function(self, instigator)
+		Decoration.activatedBy(self, instigator)
 
 		if (instigator.health < instigator.maxHealth) then
 			ActionController:addSequence({
@@ -21,9 +22,9 @@ Spring = Decoration:subclass
 	end;
 
 	defaultproperties = {
-		animType = LinearAni,
+		animType = LinearAnimation,
 		animSeq = extr_array(m_get_bitmap("spring.bmp"), 48, 72),
-		tick_time = 8,
+		animSpeed = 1 / 8,
 		w = 2,
 		h = 1,
 		offset_x = 12,

@@ -46,6 +46,27 @@ Actor = Object:subclass
 		self.health = self.maxHealth
 	end;
 
+	tick = function(self)
+		-- Handle animation
+		if (self.currentAnim) then
+			if (self.bAnimating) then
+				local length = self.currentAnim:length()
+				local newTime = self.animTime + self.animSpeed
+
+				if (newTime >= length) then
+					if (self.bLoopAnim) then
+						self:setAnimTime(newTime - length)
+					else
+						self:freezeAnimAt(length)
+					end
+					self:animEnd(self.currentAnim)
+				else
+					self:setAnimTime(newTime)
+				end
+			end
+		end
+	end;
+
 
 	-- Spawns an actor, defaults to spawning at the spawner's location
 	-- and with the spawner as owner.
@@ -73,12 +94,14 @@ Actor = Object:subclass
 	end;
 
 	died = function(self)
-		self:destroy()
 	end;
 
 	destroy = function(self)
 		m_destroy_object(self)
 	end;
+
+
+	--== Manipulating this Actor ==--
 
 	setSize = function(self, w, h)
 		self.w = w
@@ -90,9 +113,65 @@ Actor = Object:subclass
 		self.y = y
 	end;
 
+	setOffset = function(self, offset_x, offset_y, offset_z)
+		self.offset_x = offset_x
+		self.offset_y = offset_y
+		self.offset_z = offset_z
+	end;
+
 	setOwner = function(self, owner)
 		self.owner = owner
 	end;
+
+
+	--== ANIMATION FUNCTIONS ==--
+
+	playAnim = function(self, anim, rate)
+		self.currentAnim = anim
+		self.animSpeed = rate or 1
+		self:setAnimTime(1)
+		self.bAnimating = true
+	end;
+
+	loopAnim = function(self, anim, rate)
+		self:playAnim(anim, rate)
+		self.bLoopAnim = true
+	end;
+
+	isAnimating = function(self)
+		return self.bAnimating
+	end;
+
+	finishAnim = function(self)
+		self:freezeAnimAt(self.currentAnim:length())
+	end;
+
+	stopAnimating = function(self)
+		self.bAnimating = false
+	end;
+
+	animStopLooping = function(self)
+		self.bLoopAnim = false;
+	end;
+
+	freezeAnimAt = function(self, time)
+		self:setAnimTime(time)
+		self:stopAnimating()
+	end;
+
+	setAnimTime = function(self, time)
+		self.animTime = time
+		if (self.currentAnim) then
+			self.bitmap = self.currentAnim:getFrameAt(self.animTime)
+		end
+	end;
+
+
+	-- Animation notification
+
+	animEnd = function(self, anim)
+	end;
+
 
 
 	--
@@ -116,5 +195,12 @@ Actor = Object:subclass
 		tick_time = 0,
 		obstacle = 0,
 		travel = 0,
+
+		-- Animation variables
+		currentAnim = nil,
+		bAnimating = false,
+		bLoopAnim = false,
+		animTime = 0,
+		animSpeed = 0,
 	};
 }

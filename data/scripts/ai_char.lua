@@ -10,12 +10,12 @@ function CommonAIChar:event_init()
 	inherit(self, CommonAI)
 
 	-- Restore own functions
-	self.event_tick = CommonAIChar.event_tick
+	self.tick = CommonAIChar.tick
 
 	CommonAI.event_init(self)
 end
 
-function CommonAIChar:event_tick()
-	CommonAI.event_tick(self)
-	BasicCharAni.event_tick(self)
+function CommonAIChar:tick()
+	CommonAI.tick(self)
+	BasicCharAni.tick(self)
 end

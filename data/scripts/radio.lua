@@ -3,6 +3,7 @@
 -- By Bjørn Lindeijer
 
 import("Decoration.lua")
+import("Animation.lua")
 
 
 --
@@ -15,7 +16,7 @@ Radio = Decoration:subclass
 
 	defaultproperties = {
 		tick_time = 10,
-		animType = RandomAni,
+		animType = RandomAnimation,
 		animSeq = extr_array(m_get_bitmap("radio.bmp"), 17, 23),
 		convTable = {
 			{{"Frode", "Cool music."}},
@@ -36,7 +37,7 @@ JumpingBox = Decoration:subclass
 	name = "JumpingBox";
 
 	defaultproperties = {
-		animType = FrameDurationAni,
+		animType = FrameDurationAnimation,
 		animSeq = {
 			{m_get_bitmap("box1.bmp"), 1},
 			{m_get_bitmap("box2.bmp"), 2},
@@ -55,9 +56,8 @@ JumpingBox = Decoration:subclass
 			{m_get_bitmap("box9.bmp"), 10},
 			{m_get_bitmap("box8.bmp"), 6},
 		},
-		animation_speed = 1.2,
+		animSpeed = 1.2,
 		offset_y = -6,
-		tick_time = 1,
 	}
 }
 

@@ -88,7 +88,7 @@ function CommonAI:event_init()
 	self.maxHealth = self.health
 end
 
-function CommonAI:event_tick()
+function CommonAI:tick()
 	if (self.charge > 0) then self.charge = self.charge - 1 end
 
 	-- Switch to ready from walking

@@ -58,7 +58,7 @@ function Bos_Naar_Buiten:event_stand_on(obj)
 	})
 end
 
-function Buiten_Naar_Tent1:event_activate(instigator)
+function Buiten_Naar_Tent1:activatedBy(instigator)
 	local player = m_get_player()
 	if instigator ~= player or player.dir ~= DIR_UP then return end
 
@@ -79,7 +79,7 @@ function Buiten_Naar_Tent1:event_activate(instigator)
 	})
 end
 
-function Buiten_Naar_Tent2:event_activate(instigator)
+function Buiten_Naar_Tent2:activatedBy(instigator)
 	local player = m_get_player()
 	if instigator ~= player or player.dir ~= DIR_UP then return end
 	

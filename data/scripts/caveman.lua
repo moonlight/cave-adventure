@@ -13,7 +13,7 @@ function Caveman:event_init()
 	self:start_animation(caveman_anim)
 end
 
-function Caveman:event_activate(instigator)
+function Caveman:activatedBy(instigator)
 end
 
 
@@ -66,7 +66,7 @@ function CavemanSlave:event_init()
 	self:start_animation(caveman_slave_anim)
 end
 
-function CavemanSlave:event_activate(instigator)
+function CavemanSlave:activatedBy(instigator)
 end
 
 

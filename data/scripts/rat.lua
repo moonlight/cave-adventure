@@ -34,7 +34,7 @@ function Rat:do_death()
 	})
 end
 
-function Rat:event_tick()
+function Rat:tick()
 	m_message("Rat tick")
 
 	if (self.charge > 0) then self.charge = self.charge - 1 end

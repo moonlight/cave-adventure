@@ -18,7 +18,7 @@ function Boss:event_init()
 	--self:start_animation(boss_anim)
 end
 
-function Boss:event_activate(instigator)
+function Boss:activatedBy(instigator)
 end
 
 

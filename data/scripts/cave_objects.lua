@@ -11,9 +11,9 @@ CaveWaterfallExit = Decoration:subclass
 	name = "CaveWaterfallExit";
 
 	defaultproperties = {
-		animType = LinearAni,
+		animType = LinearAnimation,
 		animSeq = extr_array(m_get_bitmap("cave_waterfall_exit.bmp"), 72, 48),
-		tick_time = 10,
+		animSpeed = 1 / 10,
 
 		convTable = {
 			conv.NO_WAY_OUT,
@@ -56,22 +56,27 @@ end
 
 -- Spider web
 
-SpiderWeb = {}
+SpiderWeb = Decoration:subclass
+{
+	name = "SpiderWeb";
+	defaultproperties = {
+		draw_mode = DM_ALPHA,
+		bitmap = m_get_bitmap("web.tga"),
+		offset_y = 7,
+		offset_x = 10,
+	};
+}
 
-function SpiderWeb:event_init()
-	self.draw_mode = DM_ALPHA
-	self.bitmap = m_get_bitmap("web.tga")
-	self.offset_y = 7
-	self.offset_x = 10
-end
-
-SpiderWeb2 = {}
-function SpiderWeb2:event_init()
-	self.draw_mode = DM_ALPHA
-	self.bitmap = m_get_bitmap("web2.tga")
-	self.offset_y = 7
-	self.offset_x = -10
-end
+SpiderWeb2 = Decoration:subclass
+{
+	name = "SpiderWeb2";
+	defaultproperties = {
+		draw_mode = DM_ALPHA,
+		bitmap = m_get_bitmap("web2.tga"),
+		offset_y = 7,
+		offset_x = -10,
+	}
+}
 
 
 --
@@ -136,7 +141,7 @@ CavePile = Decoration:subclass
 {
 	name = "CavePile";
 
-	event_activate = function(self, instigator)
+	activatedBy = function(self, instigator)
 		if (picked_up_pick) then
 			ActionController:addSequence({
 				ActionExModeOn(),
@@ -171,22 +176,24 @@ CavePile = Decoration:subclass
 
 
 -- Pick and howel
-CavePick = {}
+CavePick = Decoration:subclass
+{
+	name = "CavePick";
 
-function CavePick:event_init()
-	self.draw_mode = DM_MASKED
-	self.bitmap = m_get_bitmap("cavepick.bmp")
-	self.obstacle = 1
-	self.offset_x = 0
-	self.offset_y = -10
-	self.offset_z = -10
-end	
+	activatedBy = function(self, obj)
+		picked_up_pick = 1
+		m_destroy_object(self)
+		ActionController:addSequence({
+			ActionConversation(conv.PICKUP_PICKAXE)
+		})
+	end;
 
-function CavePick:event_activate(obj)
-	picked_up_pick = 1
-	m_destroy_object(self)
-	ActionController:addSequence({
-		ActionConversation(conv.PICKUP_PICKAXE)
-	})
-end
-
+	defaultproperties = {
+		draw_mode = DM_MASKED,
+		bitmap = m_get_bitmap("cavepick.bmp"),
+		obstacle = 1,
+		offset_x = 0,
+		offset_y = -10,
+		offset_z = -10,
+	};
+}

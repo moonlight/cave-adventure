@@ -1,20 +1,18 @@
--- player.lua
--- The player class is defined here.
+--
+-- The player character is defined here.
 -- By Bjørn Lindeijer
 
-import("Pawn.lua")
+import("Character.lua")
+import("animations.lua")
 
 
-Player = Pawn:subclass
+Player = Character:subclass
 {
 	name = "Player";
 
 	init = function(self)
 		Character.init(self)
-		inherit(self, BasicCharAni)
 
-		self.event_tick = Player.event_tick  -- Restore tick function
-		self:start_animation(player_anim);
 		self:derive_attributes()
 		self.health = self.maxHealth
 	end;
@@ -34,7 +32,6 @@ Player = Pawn:subclass
 	end;
 
 	attack = function(self)
-		--m_message("Attack function called!");
 		if (self.state == CHR_HIT) then return
 		elseif (self.state == CHR_READY and self.walking == 0 and self.charging == 0) then
 			self.state = CHR_ATTACK
@@ -47,9 +44,9 @@ Player = Pawn:subclass
 			if (self.dir == DIR_DOWN)  then ay = ay + 1 end
 			local attacked_objs = m_get_objects_at(ax, ay)
 			for index, object in attacked_objs do
-				if (object.take_damage) then
+				if (object:instanceOf(Actor)) then
 					local damage = (self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))*(self.strength/95 + 18/19)
-					object:take_damage(damage)
+					object:takeDamage(damage)
 				end
 			end
 
@@ -62,9 +59,6 @@ Player = Pawn:subclass
 				ActionSetVariable(self, "charging", self.charge_time),
 				ActionExModeOff(),
 			}
-		elseif (self.state == CHR_READY) then
-			-- Either charging or walking, attack after that
-			--self.pending = CHR_ATTACK
 		end
 	end;
 
@@ -75,29 +69,25 @@ Player = Pawn:subclass
 		else self.attacking = 0
 		end
 
-		self:update_bitmap()
+		self:updateBitmap()
 	end;
 
-	event_tick = function(self)
+	tick = function(self)
 		if (self.charging > 0) then self.charging = self.charging - 1 end
-		if (self.state == CHR_READY and self.pending == CHR_ATTACK and self.charging == 0 and self.walking == 0) then
-			self.pending = CHR_READY
-			self:attack()
-		end
-		BasicCharAni.event_tick(self)
+		Character.tick(self)
 	end;
 
 	takeDamage = function(self, damage, instigator, damageType, momentum, location)
-		Pawn.takeDamage(self, damage, instigator, damageType, momentum, location)
+		Character.takeDamage(self, damage, instigator, damageType, momentum, location)
 		if (damage > 0) then
-			local obj = m_add_object(self.x, self.y, "BloodSplat")
+			local obj = self:spawn(BloodSplat, self.x, self.y)
 			obj.offset_z = obj.offset_z + 24
 		end
 	end;
 
 	died = function(self)
 		self:setState(CHR_DEAD)
-		self.animation = nil
+		self.charAnim = nil
 		self.bitmap = m_get_bitmap("frode_dead.tga")
 		ActionController:addSequence({
 			ActionExModeOn(),
@@ -124,10 +114,11 @@ Player = Pawn:subclass
 		charging = 0,
 
 		state = CHR_READY,
-		pending = CHR_READY,
 
 		draw_mode = DM_ALPHA,
 		tick_time = 1,
 		travel = 1,               -- Player can travel to other maps
+
+		charAnim = extr_char_anim(m_get_bitmap("frode.tga")),
 	}
 }

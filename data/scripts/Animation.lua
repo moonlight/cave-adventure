@@ -11,25 +11,81 @@ Animation = Object:subclass
 {
 	name = "Animation";
 
-	start = function(self, animation)
-		self:start_animation(animation)
+	init = function(self, animation)
+		self.animSeq = animation
+		self.animLength = table.getn(animation)
 	end;
 
-	stop = function(self)
-		self:stop_animation()
+	length = function(self)
+		return self.animLength
 	end;
 
-	update = function(self)
-		self:update_bitmap()
+	getFrameAt = function(self, time)
+		local time = math.min(self.animLength, math.max(0, math.floor(time + 1)))
+		return self.animSeq[math.floor(time)]
+	end;
+
+
+	defaultproperties = {
+		animSeq = nil,
+		animLength = 0,
+	}
+}
+
+
+-- BASIC LINEAR ANIMATION
+
+LinearAnimation = Animation:subclass
+{
+	name = "LinearAnimation";
+}
+
+
+-- RANDOM FRAME ANIMATION
+
+RandomAnimation = Animation:subclass
+{
+	name = "RandomAnimation";
+
+	length = function(self)
+		return 1
+	end;
+
+	getFrameAt = function(self)
+		if (self.animLength <= 1) then
+			return self.animSeq[1]
+		else
+			local n
+			repeat n = math.random(self.animLength) until n ~= self.prevFrame
+			self.prevFrame = n
+			return self.animSeq[n]
+		end
+	end;
+
+	defaultproperties = {
+		prevFrame = 0,
+	}
+}
+
+
+-- FRAMES WITH DURATION ANIMATION
+-- A more advanced animation system, in which you have to specify how long
+-- each frame is displayed.
+
+FrameDurationAnimation = Animation:subclass
+{
+	name = "FrameDurationAnimation";
+
+	init = function(self, animation)
+		
 	end;
 }
 
 
 
 
--- BASIC LINEAR ANIMATION
 -- An array of bitmaps is looped through at a certain speed.
---
+--[[
 LinearAni = Animation:subclass
 {
 	name = "LinearAni";
@@ -62,7 +118,7 @@ LinearAni = Animation:subclass
 		end
 	end;
 
-	event_tick = function(self)
+	tick = function(self)
 		self:update_bitmap()
 	end;
 
@@ -75,11 +131,10 @@ LinearAni = Animation:subclass
 	animation_count = 1;
 	animation_speed = 1;
 }
+]]
 
-
--- RANDOM FRAME ANIMATION
 -- Every tick a random bitmap is chosen.
---
+--[[
 RandomAni = Animation:subclass
 {
 	name = "RandomAni";
@@ -106,7 +161,7 @@ RandomAni = Animation:subclass
 		end
 	end;
 
-	event_tick = function(self)
+	tick = function(self)
 		self:update_bitmap()
 	end;
 
@@ -117,7 +172,7 @@ RandomAni = Animation:subclass
 	animation = {};
 	prev_animation_frame = 0;
 }
-
+]]
 
 
 -- FRAMES WITH DURATION ANIMATION
@@ -162,7 +217,7 @@ FrameDurationAni = Animation:subclass
 		end
 	end;
 
-	event_tick = function(self)
+	tick = function(self)
 		self:update_bitmap()
 	end;
 
@@ -180,13 +235,16 @@ FrameDurationAni = Animation:subclass
 }
 
 
-
 -- BASIC CHARACTER ANIMATION
 -- Switches leg every tile and adapts to character direction.
 --
 BasicCharAni = Animation:subclass
 {
 	name = "BasicCharAni";
+
+	init = function(self, char)
+		Animation.init(self)
+	end;
 
 	start_animation = function(self, animation)
 		self.animation = animation
@@ -210,19 +268,17 @@ BasicCharAni = Animation:subclass
 
 	event_walk_start = function(self)
 		self.leg_used = 1 - self.leg_used
-		--self.tick_time = 1
 	end;
 
 	event_walk_finished = function(self)
 		self:update_bitmap()
-		--self.tick_time = 0
 	end;
 
 	event_dir_change = function(self)
 		self:update_bitmap()
 	end;
 
-	event_tick = function(self)
+	tick = function(self)
 		self:update_bitmap()
 	end;
 

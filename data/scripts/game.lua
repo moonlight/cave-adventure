@@ -2,8 +2,6 @@
 -- This file defines some global functions for the game.
 -- By Bjørn Lindeijer
 
-import("Player.lua")
-
 
 game = {
 	game_over = 0,

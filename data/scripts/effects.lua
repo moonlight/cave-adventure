@@ -1,6 +1,10 @@
--- effects.lua
+--
 -- Hair raizing sparks, explosions and other effects go in here. :)
 --
+
+import("Actor.lua")
+import("animations.lua")
+
 
 
 --
@@ -24,7 +28,7 @@ function SpawnSparkyHit(x, y, offset_x, offset_y, offset_z)
 end
 
 function ShootPoison(from_obj, to_obj)
-	local blob = m_add_object(from_obj.x, from_obj.y, "PoisonProjectile")
+	local blob = Actor:spawn(PoisonProjectile, from_obj.x, from_obj.y)
 	blob.offset_y = from_obj.offset_y - 5
 
 	ActionController:addSequence({
@@ -63,7 +67,7 @@ function SmallSpark:event_init()
 	self.fz = 0.0
 end
 
-function SmallSpark:event_tick()
+function SmallSpark:tick()
 	self.life_time = self.life_time - 1
 	self.alpha = math.max(0, math.min(255, 255 * self.life_time / 100))
 
@@ -85,38 +89,60 @@ end
 --
 -- Some bloody splats
 --
-BloodSplat = {}
-function BloodSplat:event_init()
-	inherit(self, LinearAni)
-	self:start_animation(blood_splat_anim)
-	self.tick_time = 7
-end
-function BloodSplat:animation_finished()
-	m_destroy_object(self)
-end
 
-BloodSplatGreen = {}
-function BloodSplatGreen:event_init()
-	BloodSplat.event_init(self)
-	self.animation_finished = BloodSplat.animation_finished
-	self:start_animation(blood_splat_green_anim)
-end
+BloodSplat = Actor:subclass
+{
+	name = "BloodSplat";
 
-BloodSplatYellow = {}
-function BloodSplatYellow:event_init()
-	BloodSplat.event_init(self)
-	self.animation_finished = BloodSplat.animation_finished
-	self:start_animation(blood_splat_yellow_anim)
-end
+	init = function(self)
+		self:playAnim(LinearAnimation(self.animSeq))
+	end;
+	animEnd = function(self)
+		self:destroy()
+	end;
+
+	defaultproperties = {
+		animSeq = extr_array(m_get_bitmap("blood_splat.bmp"), 16, 16),
+		tick_time = 7,
+	}
+}
+
+BloodSplatGreen = BloodSplat:subclass
+{
+	name = "BloodSplatGreen";
+	defaultproperties = {
+		animSeq = extr_array(m_get_bitmap("blood_splat_green.bmp"), 16, 16),
+	}
+}
+
+BloodSplatYellow = BloodSplat:subclass
+{
+	name = "BloodSplatGreen";
+	defaultproperties = {
+		animSeq = extr_array(m_get_bitmap("blood_splat_yellow.bmp"), 16, 16),
+	}
+}
+
 
 
 --
 -- A poison projectile
 --
-PoisonProjectile = {}
-function PoisonProjectile:event_init()
-	inherit(self, LinearAni)
-	self.draw_mode = DM_MASKED
-	self:start_animation({m_get_bitmap("spit1.bmp"), m_get_bitmap("spit2.bmp")})
-	self.tick_time = 10
-end
+
+PoisonProjectile = Actor:subclass
+{
+	name = "PoisonProjectile";
+
+	init = function(self)
+		self:loopAnim(LinearAnimation(self.animSeq))
+	end;
+
+	defaultproperties = {
+		draw_mode = DM_MASKED,
+		animSeq = {
+			m_get_bitmap("spit1.bmp"),
+			m_get_bitmap("spit2.bmp"),
+		},
+		tick_time = 10,
+	};
+}

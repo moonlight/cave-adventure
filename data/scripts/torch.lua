@@ -3,6 +3,7 @@
 --
 
 import("Decoration.lua")
+import("Animation.lua")
 import("lang.lua")
 
 
@@ -11,8 +12,7 @@ Torch = Decoration:subclass
 	name = "Torch";
 
 	defaultproperties = {
-		bitmap = m_get_bitmap("torch1.bmp"),
-		animType = LinearAni,
+		animType = LinearAnimation,
 		animSeq = {
 			m_get_bitmap("torch1.bmp"),
 			m_get_bitmap("torch2.bmp"),
@@ -26,7 +26,7 @@ Torch = Decoration:subclass
 			conv.FIRE_2,
 			conv.FIRE_3,
 		},
-		tick_time = 10,
+		animSpeed = 1 / 10,
 		draw_mode = DM_MASKED,
 		offset_y = -6,
 	};

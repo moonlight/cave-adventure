@@ -11,6 +11,19 @@ Pawn = Actor:subclass
 
 	init = function(self)
 		self.health = self.maxHealth
+
+		-- Create the default controller, if present
+		if (not self.controller and self.controllerClass) then
+			self.controller = self.controllerClass()
+			self.controller:possess(self)
+		end
+	end;
+
+	tick = function(self)
+		Actor.tick(self)
+		if (self.controller) then
+			self.controller:tick()
+		end
 	end;
 
 
@@ -49,7 +62,7 @@ Pawn = Actor:subclass
 		end
 	end;
 
-	died = function(self)
+	died = function(self, killer, damageType, location)
 		-- Become bleeding body and fade away (implement in subclass)
 	end;
 
@@ -67,6 +80,10 @@ Pawn = Actor:subclass
 				self:makeNoise(10)
 			end
 		end
+	end;
+
+	attack = function(self)
+		-- Implement in subclass
 	end;
 
 	-- Making noise will cause surrounding Pawns to hear the noise with
@@ -90,5 +107,7 @@ Pawn = Actor:subclass
 		offset_y = -6,
 		draw_mode = DM_ALPHA,
 		obstacle = 1,
+
+		controllerClass = nil,
 	};
 }

@@ -48,6 +48,9 @@ Controller = Object:subclass
 	notifyHearNoise = function(self, loadness, noiseMaker)
 	end;
 
+	tick = function(self)
+	end;
+
 
 	defaultproperties =
 	{
