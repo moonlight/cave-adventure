@@ -1,0 +1,261 @@
+#!/bin/sh
+
+# thanks to Smunt for some tips :)
+
+CC=g++
+LIBS=
+LIBS_ENGINE=
+CPPFLAGS=-Wall
+# on windows set EXE_EXT to '.exe'
+EXE_EXT=
+ENGINE_EXE=rpg
+EDITOR_EXE=rpgedit
+SOUND=true
+LOG=/dev/null
+LOGERR=/dev/null
+
+# deze functie haalt dubbele argumenten uit de paramter
+# eg. CLEAN a a b c c d  
+# echo $MYRETVAL
+# a b c d
+CLEAN () {
+    MYRETVAL=""
+    for arg do
+	MYRETVAL=`echo "$MYRETVAL" | sed -e "s'$arg ''g"`"$arg "
+    done
+}
+
+
+######################################################################
+# parse command line arguments
+######################################################################
+DEBUG=false
+for arg do
+    case "$arg" in
+	--help) echo "
+--with-libdir=PATH	- add this libdir
+--with-include=PATH	- add this includedir
+--disable-sound		- disable sound support
+--debug			- compile with debug code
+--log			- save logs to configure.log configure.err
+"
+exit 0
+;;
+	--with-libdir=*) LIBS="$LIBS -L"`echo "$arg" | sed -e 's/^[^=]*=//'` ;;
+	--with-include=*) CPPFLAGS="$CPPFLAGS -I"`echo "$arg" | sed -e 's/^[^=]*=//'` ;;
+	--disable-sound) SOUND=false ;;
+	--debug) echo "Enabling debugging..."; DEBUG=true ;;
+	--log)
+	    LOG=configure.log
+	    LOGERR=configure.err
+	;;
+    esac
+done
+
+if $DEBUG ; then
+    CPPFLAGS="$CPPFLAGS -g"
+else
+    CPPFLAGS="$CPPFLAGS -O2"
+fi
+
+
+######################################################################
+# compiler check dmv versie opvragen
+# eerst g++, dan c++ en dan cpp
+# alle output naar /dev/null
+######################################################################
+echo -n "Checking for compiler... "
+echo "$CC --version" >$LOG 
+echo "$CC --version" >$LOGERR
+if $CC --version >$LOG 2>$LOGERR ; then
+    echo "g++"
+else
+    CC=c++
+    echo "$CC --version" >>$LOG 
+    echo "$CC --version" >>$LOGERR
+    if $CC --version >>$LOG 2>>$LOGERR ; then
+	echo "c++"
+    else
+	CC=cpp
+	echo "$CC --version" >>$LOG 
+	echo "$CC --version" >>$LOGERR
+	if $CC --version >>$LOG 2>>$LOGERR ; then
+	    echo "cpp"
+	else
+	    echo "*** No c++ compiler"
+	    exit 1;
+	fi
+    fi
+fi
+
+######################################################################
+# allegro-config check door versie op te vragen
+# bestaat deze, dan de LIBS en CPPFLAGS toevoegen
+######################################################################
+echo -n "Checking for allegro-config... "
+echo "allegro-config --version" >>$LOG
+echo "allegro-config --version" >>$LOGERR
+if allegro-config --version >>$LOG 2>>$LOGERR ; then
+    LIBS="$LIBS `allegro-config --libs`"
+    CPPFLAGS="$CPPFLAGS `allegro-config --cppflags`"
+    echo "yes"
+else
+    echo "no"
+    echo "*** No allegro-config found. Please add the right directory to PATH or install allegro"
+    echo "using -lalleg instead"
+    LIBS="$LIBS -lalleg"
+fi
+echo "LIBS: $LIBS" >>$LOG
+echo "LIBS: $LIBS" >>$LOGERR
+
+######################################################################
+# ff kijken of het ook compiled
+######################################################################
+echo -n "Checking for allegro... "
+cat >conftest.cpp <<EOF
+#include <allegro.h>
+
+int main(int argc, char **argv) {
+    allegro_init();
+    
+    return 0;
+}
+END_OF_MAIN()
+// ^ some ALLEGRO macro
+
+EOF
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -o /dev/null" >>$LOG
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -o /dev/null" >>$LOGERR
+if $CC $CPPFLAGS conftest.cpp $LIBS -o /dev/null >>$LOG 2>>$LOGERR ; then
+    echo "yes"
+else
+    echo "no"
+    echo "*** Allegro not working"
+    exit 1
+fi
+
+rm -f conftest*
+
+######################################################################
+# kijken of we ook kunnen lua scripten
+######################################################################
+echo -n "Checking for lua... "
+
+cat >conftest.cpp <<EOF
+#include <allegro.h>
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
+int main(int argc, char **argv) {
+    lua_State *L = NULL;
+    L = lua_open();
+
+    return 0;
+}
+END_OF_MAIN()
+
+EOF
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null" >>$LOG
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null" >>$LOGERR
+if $CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null >>$LOG 2>>$LOGERR ; then
+    # gelukt
+    LIBS="$LIBS -llua -llualib"
+    echo "yes"
+else
+    #niet gelukt
+    echo "no"
+    echo "*** Compiling of lua program failed"
+    echo "*** Please install lua. http://www.lua.org"
+    exit 1
+fi
+rm -f conftest*
+echo "LIBS: $LIBS" >>$LOG    
+echo "LIBS: $LIBS" >>$LOGERR
+
+######################################################################
+# sound check
+######################################################################
+if $SOUND ; then
+echo -n "Checking for alogg-config... "
+    echo "alogg-config --version" >>$LOG
+    echo "alogg-config --version" >>$LOGERR
+    if alogg-config --version >>$LOG 2>>$LOGERR ; then
+	LIBS_ENGINE="`alogg-config --libs` $LIBS_ENGINE"
+	CPPFLAGS="$CPPFLAGS `alogg-config --cflags` -DENABLE_MUSIC"
+	echo "yes"
+    else
+	echo "no"
+	echo "*** If you want sound install alogg. http://lyrian.free.fr/alogg/"
+	SOUND=false
+    fi
+fi
+echo "LIBS: $LIBS" >>$LOG
+echo "LIBS: $LIBS" >>$LOGERR
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOG
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOGERR
+
+# extra alogg check
+echo -n "Checking for alogg... "
+    cat >conftest.cpp <<EOF
+#include <allegro.h>
+#include <alogg/alogg.h>
+
+int main(int argc, char **argv) {
+    alogg_init();
+
+    return 0;
+}
+END_OF_MAIN()
+
+EOF
+echo "$CC $CPPFLAGS conftest.cpp -lalogg -logg -lvorbis -lvorbisfile -lvorbisenc $LIBS $LIBS_ENGINE -o /dev/null" >>$LOG
+echo "$CC $CPPFLAGS conftest.cpp -lalogg -logg -lvorbis -lvorbisfile -lvorbisenc $LIBS $LIBS_ENGINE -o /dev/null" >>$LOGERR
+if $CC $CPPFLAGS conftest.cpp -lalogg -logg -lvorbis -lvorbisfile -lvorbisenc $LIBS $LIBS_ENGINE -o /dev/null >>$LOG 2>>$LOGERR ; then
+    # gelukt
+    LIBS_ENGINE="-lalogg -logg -lvorbis -lvorbisfile -lvorbisenc $LIBS_ENGINE"
+    CPPFLAGS="$CPPFLAGS -DENABLE_MUSIC"
+    SOUND=true
+    echo "yes"
+else
+    #niet gelukt
+    echo "no"
+    echo "*** If you want sound install alogg. http://lyrian.free.fr/alogg/"
+fi
+rm -f conftest*
+
+echo "LIBS: $LIBS" >>$LOG
+echo "LIBS: $LIBS" >>$LOGERR
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOG
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOGERR
+
+######################################################################
+######################################################################
+######################################################################
+# dat was het voor vandaag, nog even een Makefile schrijven.
+######################################################################
+
+CLEAN $CPPFLAGS
+CPPFLAGS=$MYRETVAL
+
+CLEAN $LIBS
+LIBS=$MYRETVAL
+echo "LIBS: $LIBS" >>$LOG
+echo "LIBS: $LIBS" >>$LOGERR
+
+CLEAN $LIBS_ENGINE
+LIBS_ENGINE=$MYRETVAL
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOG
+echo "LIBS_ENGINE: $LIBS_ENGINE" >>$LOGERR
+
+sed "s,@cc@,$CC,;
+s'@cppflags@'$CPPFLAGS';
+s'@libs@'$LIBS';
+s'@libs_engine@'$LIBS_ENGINE';
+s'@engine_exe@'$ENGINE_EXE';
+s'@editor_exe@'$EDITOR_EXE';" Makefile.in > Makefile
+
+echo ""
+echo "Now type 'make' to compile"

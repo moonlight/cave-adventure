@@ -1,0 +1,75 @@
+#
+#  RPG makefile
+#
+#   run "make" to compile the RPG and RPG Edit
+#   run "make remake" to recompile everything
+#   run "make clean" to clean up the object files
+#
+CC := @cc@
+CPPFLAGS := @cppflags@
+ENGINE_EXE := @engine_exe@
+EDITOR_EXE := @editor_exe@
+
+COMMON_OBJS := $(patsubst %.cpp, %.o, $(wildcard src/shared/*.cpp))
+EDITOR_OBJS := $(patsubst %.cpp, %.o, $(wildcard src/editor/*.cpp))
+ENGINE_OBJS := $(patsubst %.cpp, %.o, $(wildcard src/*.cpp))
+COMMON_LIBS := @libs@
+#COMMON_LIBS := -lalleg -llua -llualib
+ENGINE_LIBS := @libs_engine@
+#ENGINE_LIBS := =lalogg -logg -lvorbis -lvorbisfile -lvorbisenc
+
+DATA_LUA := $(wildcard data/scripts/*.lua)
+DATA_BMP := $(wildcard data/bitmaps/*.bmp wildcard data/bitmaps/*.tga)
+DATA_FONT := $(wildcard data/bitmaps/font_*.*)
+DATA_MAP := $(wildcard data/maps/*.map)
+DATA_SAMPS := $(wildcard data/samples/*.wav)
+DATA_MIDIS := $(wildcard data/music/*.mid)
+
+.PHONY: default remake clean
+
+default: $(ENGINE_EXE) $(EDITOR_EXE) data.dat
+remake: clean default
+
+clean:
+	rm -f src/*.o src/editor/*.o src/shared/*.o
+
+%.o: %.cpp
+	$(CC) $(CPPFLAGS) -c $< -o $@
+
+$(ENGINE_EXE): $(COMMON_OBJS) $(ENGINE_OBJS)
+	$(CC) $(CPPFLAGS) -o $(ENGINE_EXE) $(COMMON_OBJS) $(ENGINE_OBJS) $(ENGINE_LIBS) $(COMMON_LIBS)
+
+$(EDITOR_EXE): $(COMMON_OBJS) $(EDITOR_OBJS)
+	$(CC) $(CPPFLAGS) -o $(EDITOR_EXE) $(COMMON_OBJS) $(EDITOR_OBJS) $(COMMON_LIBS)
+
+# data.dat updater, vraagt de lijst vernieuwde datafiles op, loopt ze langs, kijkt waar ze bij horen
+# voegt ze toe aan de bij de groep behorende variabele en update dan de juiste groepen (door te 
+# testen op niet lege variables
+data.dat: $(DATA_LUA) $(DATA_BMP) $(DATA_FONT) $(DATA_MAP) $(DATA_SAMPS) $(DATA_MIDIS)
+	@list='$?'; \
+	for file in $$list; do \
+	  if echo "$(DATA_LUA)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DELUAS="$$DELUAS $$file"; \
+	  fi; \
+	  if echo "$(DATA_BMP)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DEBMPS="$$DEBMPS $$file"; \
+	  fi; \
+	  if echo "$(DATA_FONT)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DEFONTS="$$DEFONTS $$file"; \
+	  fi; \
+	  if echo "$(DATA_MAP)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DEMAPS="$$DEMAPS $$file"; \
+	  fi; \
+	  if echo "$(DATA_SAMPS)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DESAMPS="$$DESAMPS $$file"; \
+	  fi; \
+	  if echo "$(DATA_MIDIS)" | grep "$$file" > /dev/null 2>/dev/null ; then \
+	    DEMIDIS="$$DEMIDIS $$file"; \
+	  fi; \
+	done;\
+	if test -n "$$DELUAS" ; then dat -a -k -t LUA data.dat $$DELUAS; fi; \
+	if test -n "$$DEBMPS" ; then dat -a -k -t BMP data.dat $$DEBMPS; fi; \
+	if test -n "$$DEFONTS" ; then dat -a -k -t FONT data.dat $$DEFONTS; fi; \
+	if test -n "$$DEMAPS" ; then dat -a -k -t MAP data.dat $$DEMAPS; fi; \
+	if test -n "$$DESAMPS" ; then dat -a -k -t SAMP data.dat $$DESAMPS; fi; \
+	if test -n "$$DEMIDIS" ; then dat -a -k -t MIDI data.dat $$DEMIDIS; fi; \
