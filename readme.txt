@@ -69,7 +69,7 @@ If the game runs choppy, try reducing the colordepth to 16 or 15 bit.
 History
 -------
 
-March, 7th -:-- (First post-contest release)
+March, 29th -:-- (First post-contest release)
 
 - Added 24 and 32 bit colordepth support (32 enabled by default)
 - Added second layer to maps, above the objects
@@ -83,6 +83,7 @@ March, 7th -:-- (First post-contest release)
 - Improved Game Over screen
 - Improved GUI
 - Upgraded Lua from 4.0 to 5.0
+- Changed scripts structure, now Object Oriented
 - Fixed little bug in linear animations
 - Fixed color of damage splats on spiders
 
