@@ -2,6 +2,8 @@
 -- Fences... they can prevent people from leaving or entering a certain area.
 -- By Frode Lindeijer
 
+import("Object.lua")
+
 
 FenceR = {}
 Fence1 = {}

@@ -46,17 +46,43 @@ function ActionCallFunction(f, ...)
 	me.arg = arg
 
 	function me:finished()
-		if (table.getn(self.arg) == 0) then self.f() end
-		if (table.getn(self.arg) == 1) then self.f(self.arg[1]) end
-		if (table.getn(self.arg) == 2) then self.f(self.arg[1], self.arg[2]) end
-		if (table.getn(self.arg) == 3) then self.f(self.arg[1], self.arg[2], self.arg[3]) end
-		if (table.getn(self.arg) == 4) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4]) end
-		if (table.getn(self.arg) == 5) then self.f(self.arg[1], self.arg[2], self.arg[3], self.arg[4], self.arg[5]) end
+		self.f(expand(self.arg))
 		return 1
 	end
 
 	return me
 end
+
+-- An example of what OO with inheritance would look like in Lua
+--[[
+Action = Object:subclass
+{
+	-- The _init function is generally used to store the arguments.
+	_init = function(self) end
+
+	-- This function indicates whether this action is finished. It will be
+	-- called at least once.
+	finished = function(self) end
+
+	-- The exec function will be called every game tick until the finished()
+	-- function returns 1.
+	exec = function(self) end
+}
+
+ActionCallFunction = Action:subclass
+{
+	_init = function(f, ...)
+		self.name = "CallFunction"
+		self.f = f
+		self.arg = arg
+	end,
+
+	finished = function()
+		self.f(expand(self.arg))
+		return 1
+	end,
+}
+]]
 
 -- Pause a sequence for <duration> game ticks
 
@@ -424,7 +450,11 @@ function ActionAddObject(name, x, y)
 	me.x = x
 	me.y = y
 	function me:finished()
-		m_add_object(self.x, self.y, self.objname)
+		if (type(self.objname) == "string") then
+			m_add_object(self.x, self.y, self.objname)
+		else
+			spawn(self.x, self.y, self.objname)
+		end
 		return 1
 	end
 	return me

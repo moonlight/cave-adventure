@@ -2,29 +2,25 @@
 -- Cave-specific objects
 --
 
+import("Decoration.lua")
+import("lang.lua")
 
-CaveWaterfallExit = {}
 
-function CaveWaterfallExit:event_init()
-	inherit(self, LinearAni)
+CaveWaterfallExit = Decoration:subclass
+{
+	name = "CaveWaterfallExit";
 
-	self:start_animation(cave_waterfall_exit_anim)
-	self.tick_time = 10
-	self.draw_mode = DM_MASKED
-end
+	defaultproperties = {
+		animType = LinearAni,
+		animSeq = extr_array(m_get_bitmap("cave_waterfall_exit.bmp"), 72, 48),
+		tick_time = 10,
 
-function CaveWaterfallExit:event_activate(instigator)
-	local text_table = {
-		conv.NO_WAY_OUT,
-		conv.NO_ESCAPE,
-	}
-
-	n = get_new_n(self.prev_random, table.getn(text_table))
-	self.prev_random = n
-
-	write_conversation(text_table[n])
-end
-
+		convTable = {
+			conv.NO_WAY_OUT,
+			conv.NO_ESCAPE,
+		},
+	};
+}
 
 
 --
@@ -103,64 +99,75 @@ function CaveBridge2:event_init()
 end
 
 -- Pile of rubble
-CavePileTop = {}
+CavePileTop = Decoration:subclass
+{
+	name = "CavePileTop";
 
-function CavePileTop:event_init()
-	self.draw_mode = DM_MASKED
-	self.bitmap = m_get_bitmap("rubble_t.bmp")
-	self.offset_x = 24
-	self.offset_y = 5
-	self.offset_z = 0
-	self.obstacle = 1
-	self.w = 3
-	self.h = 2
-end	
+	defaultproperties = {
+		draw_mode = DM_MASKED,
+		bitmap = m_get_bitmap("rubble_t.bmp"),
+		offset_x = 24,
+		offset_y = 5,
+		offset_z = 0,
+		obstacle = 1,
+		w = 3,
+		h = 2,
+	};
+}
 
-CavePileBottom = {}
+CavePileBottom = Decoration:subclass
+{
+	name = "CavePileBottom";
 
-function CavePileBottom:event_init()
-	self.draw_mode = DM_MASKED
-	self.bitmap = m_get_bitmap("rubble_b.bmp")
-	self.offset_x = 24
-	self.offset_y = -10
-	self.offset_z = 0
-	self.obstacle = 1
-	self.w = 3
-	self.h = 2
-end	
+	defaultproperties = {
+		draw_mode = DM_MASKED,
+		bitmap = m_get_bitmap("rubble_b.bmp"),
+		offset_x = 24,
+		offset_y = -10,
+		offset_z = 0,
+		obstacle = 1,
+		w = 3,
+		h = 2,
+	};
+}
 
-CavePile = {}
 
-function CavePile:event_init()
-	self.draw_mode = DM_MASKED
-	self.bitmap = m_get_bitmap("cavepile.bmp")
-	self.offset_x = 24
-	self.offset_y = -12
-	self.offset_z = 0
-	self.obstacle = 1
-	self.w = 3
-	self.h = 5
-end
+CavePile = Decoration:subclass
+{
+	name = "CavePile";
 
-function CavePile:event_activate(obj)
-	if (picked_up_pick) then
-		SeqControl:add_sequence({
-			ActionExModeOn(),
-			ActionConversation(conv.USE_PICKAXE),
-			ActionFadeOutMap(100),
-			ActionDestroyObject(self),
-			ActionAddObject("CavePileTop", 16, 29),
-			ActionAddObject("CavePileBottom", 16, 32),
-			ActionFadeInMap(100),
-			ActionConversation(conv.PICKAXE_WORKED),
-			ActionExModeOff(),
-		})
-	else
-		SeqControl:add_sequence({
-			ActionConversation(conv.PILE_WONT_BUDGE),
-		})
-	end
-end
+	event_activate = function(self, instigator)
+		if (picked_up_pick) then
+			SeqControl:add_sequence({
+				ActionExModeOn(),
+				ActionConversation(conv.USE_PICKAXE),
+				ActionFadeOutMap(100),
+				ActionDestroyObject(self),
+				ActionAddObject(CavePileTop, 16, 29),
+				ActionAddObject(CavePileBottom, 16, 32),
+				ActionFadeInMap(100),
+				ActionConversation(conv.PICKAXE_WORKED),
+				ActionExModeOff(),
+			})
+		else
+			SeqControl:add_sequence({
+				ActionConversation(conv.PILE_WONT_BUDGE),
+			})
+		end
+	end;
+
+	defaultproperties = {
+		draw_mode = DM_MASKED,
+		bitmap = m_get_bitmap("cavepile.bmp"),
+		offset_x = 24,
+		offset_y = -12,
+		offset_z = 0,
+		obstacle = 1,
+		w = 3,
+		h = 5,
+	};
+}
+
 
 
 -- Pick and howel

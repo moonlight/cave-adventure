@@ -21,13 +21,10 @@ function add_animations()
 	player_anim = frode_anim
 
 	-- Other animations
-	cave_waterfall_exit_anim = extr_array(m_get_bitmap("cave_waterfall_exit.bmp"), 72, 48)
-	radio_anim = extr_array(m_get_bitmap("radio.bmp"), 17, 23)
 	z_anim = extr_array(m_get_bitmap("z.tga"), 24, 24)
 	blood_splat_anim = extr_array(m_get_bitmap("blood_splat.bmp"), 16, 16)
 	blood_splat_green_anim = extr_array(m_get_bitmap("blood_splat_green.bmp"), 16, 16)
 	blood_splat_yellow_anim = extr_array(m_get_bitmap("blood_splat_yellow.bmp"), 16, 16)
-	spring_anim = extr_array(m_get_bitmap("spring.bmp"), 48, 72)
 end
 
 

@@ -1,49 +1,83 @@
--- ani_types.lua
--- Here we define some basic character animation shemes that can be used
--- by objects.
+-- Animation.lua
+-- All animation schemes should inherit from this basic structure, exposing
+-- start, stop and update features and making the bitmap accesible through
+-- a bitmap member variable.
 -- By Bjørn Lindeijer
+
+import("Object.lua")
+
+
+Animation = Object:subclass
+{
+	name = "Animation";
+
+	start = function(self, animation)
+		self:start_animation(animation)
+	end;
+
+	stop = function(self)
+		self:stop_animation()
+	end;
+
+	update = function(self)
+		self:update_bitmap()
+	end;
+}
+
+
 
 
 -- BASIC LINEAR ANIMATION
 -- An array of bitmaps is looped through at a certain speed.
 --
-LinearAni = {
-	animation = {},
-	animation_count = 1,
-	animation_speed = 1,
+LinearAni = Animation:subclass
+{
+	name = "LinearAni";
+
+	start_animation = function(self, animation)
+		self.animation_count = 1
+		self.animation = animation
+		self:update_bitmap()
+	end;
+
+	stop_animation = function(self)
+		self.animation = nil
+	end;
+
+	update_bitmap = function(self)
+		local nr = table.getn(self.animation)
+
+		if (self.animation and table.getn(self.animation) > 0) then
+			self.bitmap = self.animation[self.animation_count]
+		end
+
+		self.animation_count = self.animation_count + self.animation_speed
+
+		if (self.animation and self.animation_count > nr and nr > 0) then
+			self.animation_count = 1
+
+			if (self.animation_finished) then
+				self:animation_finished()
+			end
+		end
+	end;
+
+	event_tick = function(self)
+		self:update_bitmap()
+	end;
+
+	defaultproperties = {
+		--animation = {},
+		--animation_count = 1,
+		--animation_speed = 1,
+	};
+	animation = {};
+	animation_count = 1;
+	animation_speed = 1;
 }
 
-function LinearAni:start_animation(animation)
-	self.animation_count = 1
-	self.animation = animation
-	self:update_bitmap()
-end
-function LinearAni:stop_animation()
-	self.animation = nil
-end
-function LinearAni:update_bitmap()
-	local nr = table.getn(self.animation)
 
-	if (self.animation and table.getn(self.animation) > 0) then
-		self.bitmap = self.animation[self.animation_count]
-	end
-
-	self.animation_count = self.animation_count + self.animation_speed
-
-	if (self.animation and self.animation_count > nr and nr > 0) then
-		self.animation_count = 1
-
-		if (self.animation_finished) then
-			self:animation_finished()
-		end
-	end
-end
-function LinearAni:event_tick()
-	self:update_bitmap()
-end
-
-
--- math.random FRAME ANIMATION
+-- RANDOM FRAME ANIMATION
 -- Every tick a math.random bitmap is chosen.
 --
 RandomAni = {

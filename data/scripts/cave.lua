@@ -1,9 +1,12 @@
 -- cave.lua
 -- Cave filling scripts
 
+import("Torch.lua")
+import("Spring.lua")
+
 
 function prepare_cave1()
-	m_add_object(56, 30, "Spring")
+	spawn(56, 30, Spring)
 
 	-- Spider webs
 	
@@ -63,18 +66,19 @@ function prepare_cave1()
 
 
 	-- Torches
-	m_add_object(51, 56, "Torch")
-	m_add_object(58, 30, "Torch")
-	m_add_object(53, 22, "Torch")
-	m_add_object(22,  7, "Torch")
-	m_add_object(29,  7, "Torch")
-	m_add_object(20, 16, "Torch")
-	m_add_object(29, 18, "Torch")
-	m_add_object( 5, 56, "Torch")
-	m_add_object(29, 63, "Torch")
+	-- EXPERIMENTAL CREATION OF THE TORCHES
+	spawn(51, 56, Torch)
+	spawn(58, 30, Torch)
+	spawn(53, 22, Torch)
+	spawn(22,  7, Torch)
+	spawn(29,  7, Torch)
+	spawn(20, 16, Torch)
+	spawn(29, 18, Torch)
+	spawn( 5, 56, Torch)
+	spawn(29, 63, Torch)
 
 	-- Flowing waterfall
-	m_add_object(50, 3, "CaveWaterfallExit")
+	spawn(50, 3, CaveWaterfallExit)
 
 	-- Add something generating music
 	-- obj = m_add_object(54, 3, "Radio")
@@ -93,7 +97,7 @@ function prepare_cave1()
 	m_add_object(45,68,"CaveBridge2")
 
 	-- Pile of rubble
-	m_add_object(16,32,"CavePile")
+	spawn(16, 32, CavePile)
 
 	-- Pick
 	m_add_object(27,8,"CavePick")
@@ -104,8 +108,8 @@ function prepare_cave1()
 end
 
 function prepare_cave2()
-	m_add_object(44,  7, "Spring")
-	m_add_object(6,  42, "Spring")
+	spawn(44,  7, Spring)
+	spawn(6,  42, Spring)
 	
 	-- Spider webs
 	m_add_object(19,  7, "SpiderWeb")
@@ -230,7 +234,7 @@ function prepare_cave2()
 end
 
 function prepare_cave3()
-	m_add_object(12, 12, "Spring")
+	spawn(12, 12, Spring)
 
 	-- Torches
 	m_add_object(30,  9, "Torch")

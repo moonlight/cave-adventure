@@ -1,36 +1,33 @@
 -- Spring.lua
 -- The spring by Frode
 
-Spring = {}
+import("Decoration.lua")
+import("lang.lua")
 
-function Spring:event_init()
-	inherit(self, BasicObject)
-	inherit(self, LinearAni)
 
-	self:start_animation(spring_anim)
-	self.tick_time = 8
-	self.draw_mode = DM_MASKED
-	self.w = 2
-	self.h = 1
-	self.offset_x = 12
+Spring = Decoration:subclass
+{
+	event_activate = function(self, instigator)
+		Decoration.event_activate(self, instigator)
 
-end
+		if (instigator.health < instigator.maxHealth) then
+			SeqControl:add_sequence({
+				ActionTweenVariable(instigator, "health", 2*(instigator.maxHealth - instigator.health), instigator.maxHealth),
+			})
+		end
+	end;
 
-function Spring:event_activate(instigator)
-	local text_table = {
-		conv.REFRESHING,
-		conv.COULD_USE_THAT,
-		conv.MUCH_BETTER,
-	}
-	
-	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
-	self.prev_random = n
-
-	write_conversation(text_table[n])
-
-	if (player.health < player.maxHealth) then
-		SeqControl:add_sequence({
-			ActionTweenVariable(player, "health", 2*(player.maxHealth - player.health), player.maxHealth),
-		})
-	end
-end
+	defaultproperties = {
+		animType = LinearAni,
+		animSeq = extr_array(m_get_bitmap("spring.bmp"), 48, 72),
+		tick_time = 8,
+		w = 2,
+		h = 1,
+		offset_x = 12,
+		convTable = {
+			conv.REFRESHING,
+			conv.COULD_USE_THAT,
+			conv.MUCH_BETTER,
+		}
+	};
+}

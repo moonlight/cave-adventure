@@ -175,7 +175,7 @@ function write_conversation(data)
 end
 
 --
--- Another helper function to make it easier to choose a math.random thing to say, unequal
+-- Another helper function to make it easier to choose a random thing to say, unequal
 -- to what was said last time.
 --
 function get_new_n(old_n, max_n)
