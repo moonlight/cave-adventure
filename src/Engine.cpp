@@ -27,7 +27,10 @@ char area_name[64];
 char map_filename[64];
 
 
-//====================================================================================
+//===================   Object   =====================================================
+
+const char Object::className[16] = "Object";
+int Object::id_counter = 0;
 
 Object::Object(int luaTableRef):
 	walking(0), speed(0), dir(0), prev_dir(0),
@@ -35,10 +38,12 @@ Object::Object(int luaTableRef):
 	bitmap(NULL),
 	x(0), y(0), w(1), h(1), obstacle(0),
 	offset_x(0), offset_y(0), offset_z(0),
-	destroy(0),
+	_destroy(0),
 	tableRef(luaTableRef),
 	travel(0)
 {
+	id = ++id_counter;
+
 	// Create my entity and put it on the map
 	entity = new Entity();
 	entity->pos = tiledMap->tileToMap(Point(x,y));
@@ -54,24 +59,51 @@ Object::Object(int luaTableRef):
 	lua_pop(L, 1);
 }
 
+Object::Object(lua_State *L):
+	walking(0), speed(0), dir(0), prev_dir(0),
+	count(0), tick(0),
+	bitmap(NULL),
+	x(0), y(0), w(1), h(1), obstacle(0),
+	offset_x(0), offset_y(0), offset_z(0),
+	_destroy(0),
+	tableRef(0),
+	travel(0)
+{
+	id = ++id_counter;
+
+	// Create my entity and put it on the map
+	entity = new Entity();
+	entity->pos = tiledMap->tileToMap(Point(x,y));
+	tiledMap->addEntity(entity);
+
+	//Lunar<Object>::call(L, this, "event_init");
+	update_entity();
+}
+
+
 Object::~Object()
 {
-	// Notify the object that it is being destroyed
-	callMemberFunction(tableRef, "event_destroyed");
+	if (tableRef != 0) {
+		// Notify the object that it is being destroyed
+		callMemberFunction(tableRef, "event_destroyed");
 
-	// Set the reference to the C++ object to NULL in the Lua table
-	lua_getref(L, tableRef);         // 1
-	lua_pushstring(L, "_pointer");   // 2
-	lua_pushlightuserdata(L, NULL);  // 3
-	lua_rawset(L, -3);               // 1
-	lua_pop(L, 1);                   // 0
+		// Set the reference to the C++ object to NULL in the Lua table
+		lua_getref(L, tableRef);         // 1
+		lua_pushstring(L, "_pointer");   // 2
+		lua_pushlightuserdata(L, NULL);  // 3
+		lua_rawset(L, -3);               // 1
+		lua_pop(L, 1);                   // 0
 
-	// Allow Lua to garbage collect the object.
-	lua_unref(L, tableRef);
+		// Allow Lua to garbage collect the object.
+		lua_unref(L, tableRef);
+	}
 
-	// Remove the entity from the map and delete it.
-	tiledMap->removeEntity(entity);
-	delete entity;
+	if (entity != NULL) {
+		// Remove the entity from the map and delete it.
+		tiledMap->removeEntity(entity);
+		delete entity;
+		entity = NULL;
+	}
 }
 
 void Object::walk(int dir)
@@ -243,6 +275,76 @@ void Object::update_entity()
 	entity->pos = mapPos;
 }
 
+int Object::walk(lua_State *L)
+{
+	lua_settop(L, 2);
+	int dir = luaL_checknumber(L, 1);
+	if (!lua_isnumber(L, 2) || !lua_tonumber(L, 2)) {
+		walk_nocol(dir);
+	} else {
+		walk(dir);
+	}
+	return 0;
+}
+
+int Object::subclass(lua_State *L)
+{
+	allegro_message("subclass called!");
+	lua_settop(L, 1);
+	if (!lua_istable(L, 1)) {
+		lua_newtable(L);
+		lua_replace(L, 1);
+	}
+	lua_getmetatable(L, 1);
+	lua_pushstring(L, "__index");
+	lua_getref(L, tableRef);
+	lua_settable(L, -3);
+	lua_pop(L, 1);
+	return 1;
+}
+
+
+
+Lunar<Object>::RegType Object::methods[] = {
+  method(Object, destroy),
+  method(Object, walk),
+  //method(Object, subclass),
+  {0,0}
+};
+
+Lunar<Object>::RegType Object::getters[] = {
+  member(Object, id,       getid),
+  member(Object, x,        getx),
+  member(Object, y,        gety),
+  member(Object, w,        getw),
+  member(Object, h,        geth),
+  member(Object, offset_x, getoffset_x),
+  member(Object, offset_y, getoffset_y),
+  member(Object, offset_z, getoffset_z),
+  member(Object, travel,   gettravel),
+  member(Object, speed,    getspeed),
+  member(Object, tick,     gettick),
+  member(Object, obstacle, getobstacle),
+  member(Object, bitmap,   getbitmap),
+  {0,0}
+};
+
+Lunar<Object>::RegType Object::setters[] = {
+  member(Object, x,        setx),
+  member(Object, y,        sety),
+  member(Object, w,        setw),
+  member(Object, h,        seth),
+  member(Object, offset_x, setoffset_x),
+  member(Object, offset_y, setoffset_y),
+  member(Object, offset_z, setoffset_z),
+  member(Object, travel,   settravel),
+  member(Object, speed,    setspeed),
+  member(Object, tick,     settick),
+  member(Object, obstacle, setobstacle),
+  member(Object, bitmap,   setbitmap),
+  {0,0}
+};
+
 
 //===================   Engine functions   ===========================================
 
@@ -252,7 +354,7 @@ void update_objects()
 
 	// Destroy all objects at the beginning of the object map
 	// that should be destroyed
-	while (!objects.empty() && (*objects.begin())->destroy)
+	while (!objects.empty() && (*objects.begin())->_destroy)
 	{
 		i = objects.begin();
 
@@ -263,7 +365,7 @@ void update_objects()
 	// Iterate through all objects, destroying the dead and updating the others.
 	for (i = objects.begin(); i != objects.end(); i++)
 	{
-		if ((*i)->destroy)
+		if ((*i)->_destroy)
 		{
 			//console.log(CON_CONSOLE, CON_DEBUG, "Destroying object at (%d, %d)", (*i)->x, (*i)->y);
 			list<Object*>::iterator i2 = i;
@@ -450,6 +552,17 @@ Object* add_object(int x, int y, const char* type)
 	return newObject;
 }
 
+Object* register_object(int tableRef)
+{
+	console.log(CON_LOG, CON_VDEBUG, "Registering object.");
+	Object* newObject = new Object(tableRef);
+	
+	objects.push_back(newObject);
+	newObject->initialize();
+
+	return newObject;
+}
+
 
 int l_set_player(lua_State *L)
 {
@@ -474,6 +587,7 @@ int l_get_bitmap(lua_State *L)
 	const char *name;
 	BITMAP* found_bitmap = NULL;
 	getLuaArguments(L, "s", &name);
+	char tmp[256];
 
 	DATAFILE *found_object = find_datafile_object(bitmap_data, name);
 
@@ -481,7 +595,8 @@ int l_get_bitmap(lua_State *L)
 		found_bitmap = (BITMAP*)found_object->dat;
 		return putLuaArguments(L, "b", found_bitmap);
 	} else {
-		lua_pushstring(L, "Error: Cannot find requested bitmap!");
+		sprintf(tmp, "Error: Cannot find requested bitmap (%s)!", name);
+		lua_pushstring(L, tmp);
 		lua_error(L);
 		return 0;
 	}

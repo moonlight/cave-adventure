@@ -13,9 +13,14 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include "lunar.h"
+
 
 #define DAT_LUA  DAT_ID('L','U','A',' ')
 
+// Luna method and member table helpers
+#define method(class, name) {#name, &class::name}
+#define member(class, name, method) {#name, &class::method}
 
 extern lua_State* L;
 
@@ -42,6 +47,7 @@ int l_console_message(lua_State *L);
 int l_import_tile_bmp(lua_State *L);
 
 int l_add_object(lua_State *L);
+int l_register_object(lua_State *L);
 int l_destroy_object(lua_State *L);
 int l_get_objects_at(lua_State *L);
 

@@ -12,16 +12,17 @@
 #include "Sound.h"
 #include "Script.h"
 #include "Canvas.h"
+#include "ScriptObj.h"
 
 
 lua_State* L = NULL;
 
 char lua_include[] =
-"function inherit(to, from)			\n"
-"	for index, value in from do		\n"
-"		to[index] = value			\n"
-"	end								\n"
-"end								\n"
+"function inherit(to, from)					\n"
+"	for index, value in pairs(from) do		\n"
+"		to[index] = value					\n"
+"	end										\n"
+"end										\n"
 
 "DM_INVISIBLE = 0					\n"
 "DM_ADD = 1							\n"
@@ -36,8 +37,37 @@ char lua_include[] =
 "DIR_DOWN = 3						\n"
 ;
 
+int load_level;
+
 
 //===================   The engine to script interface   ============================/
+
+int l_import(lua_State *L)
+{
+	load_level++;
+	char *spaces = (char*)malloc((load_level + 1) * sizeof(char));
+	for (int i = 0; i < load_level; i++) spaces[i] = ' ';
+	spaces[load_level] = '\0';
+
+	const char* name = luaL_checkstring(L, 1);
+	DATAFILE *found_object = find_datafile_object(bitmap_data, name);
+
+	if (found_object && found_object->type == DAT_LUA) {
+		console.log(CON_LOG, CON_ALWAYS, "%s> \"%s\"", spaces, name);
+		//handleLuaError(luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name), name);
+		if (luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name)) {
+			lua_error(L);
+		}
+		lua_call(L, 0, 0);  /* call main */
+	}
+	else {
+		console.log(CON_LOG, CON_ALWAYS, "%sX \"%s\" not found!", spaces, name);
+	}
+
+	free(spaces);
+	load_level--;
+	return 0;
+}
 
 void initScripting()
 {
@@ -46,10 +76,15 @@ void initScripting()
 
 	// Enable these Lua libraries to the script
 	luaopen_base(L);
-	luaopen_io(L);
 	luaopen_string(L);
 	luaopen_math(L);
 	luaopen_table(L);
+
+	// Add the Object type to Lua
+	//Lunar<Object>::Register(L);
+
+	// Enable object oriented stuff
+	//lua_tobjlibopen(L);
 
 	// Create meta table for objects
 	lua_newtable(L);
@@ -65,7 +100,6 @@ void initScripting()
 	lua_atpanic(L, l_alert);
 
 	// Register global functions
-	//lua_register(L, "_ALERT",           l_alert);
 	lua_register(L, "m_message",        l_console_message);
 
 	lua_register(L, "m_import_tile_bmp", l_import_tile_bmp);
@@ -74,6 +108,7 @@ void initScripting()
 	lua_register(L, "m_create_sub_bitmap", l_create_sub_bitmap);
 
 	lua_register(L, "m_add_object",     l_add_object);
+	lua_register(L, "m_register_object", l_register_object);
 	lua_register(L, "m_destroy_object", l_destroy_object);
 	lua_register(L, "m_set_player",     l_set_player);
 	lua_register(L, "m_get_player",     l_get_player);
@@ -106,6 +141,7 @@ void initScripting()
 	lua_register(L, "m_get_number_of_channels", l_get_number_of_channels);
 
 	lua_register(L, "m_quit_game",      l_quit_game);
+	lua_register(L, "import",           l_import);
 
 	handleLuaError(lua_dostring(L, lua_include), "lua_include");
 
@@ -119,11 +155,15 @@ void initScripting()
 	const char* name;
 	char tmp[256];
 
-	for (i=0; bitmap_data[i].type != DAT_END; i++) {
+	for (i = 0; bitmap_data[i].type != DAT_END; i++) {
 		name = get_datafile_property(bitmap_data+i, DAT_NAME);
 		if (bitmap_data[i].type == DAT_LUA) {
 			console.log(CON_LOG, CON_ALWAYS, "> \"%s\"", name);
-			handleLuaError(lua_dobuffer(L, (char*)bitmap_data[i].dat, bitmap_data[i].size, name), name);
+			load_level = 0;
+			if (luaL_loadbuffer(L, (char*)bitmap_data[i].dat, bitmap_data[i].size, name)) {
+				lua_error(L);
+			}
+			lua_call(L, 0, 0);  /* call main */
 		}
 	}
 
@@ -427,11 +467,28 @@ int l_add_object(lua_State *L)
 	return putLuaArguments(L, "o", add_object(x, y, type));
 }
 
+int l_register_object(lua_State *L)
+{
+	if (lua_istable(L, 1)) {
+		int ref = lua_ref(L, 1);
+		register_object(ref);
+		// The object may not be garbage collected while in use by the engine
+		//lua_unref(L, ref);
+		lua_settop(L, 0);
+		lua_getref(L, ref);
+		return 1;
+	}
+	else {
+		lua_error(L);
+		return 0;
+	}
+}
+
 int l_destroy_object(lua_State *L)
 {
 	Object *obj;
 	getLuaArguments(L, "o", &obj);
-	if (obj) obj->destroy = true;
+	if (obj) obj->_destroy = true;
 	lua_settop(L, 0);
 	return 0;
 }
@@ -640,12 +697,12 @@ int object_gettable(lua_State *L)
 {
 	if (lua_isstring(L, -1)) 
 	{
-		const char *index = lua_tostring(L, -1);
+		const char *index = lua_tostring(L, -1);      // table key
 
-		lua_pushstring(L, "_pointer");
-		lua_rawget(L, -3);
-		Object *obj = (Object*)lua_touserdata(L, -1);
-		lua_pop(L, 1);
+		lua_pushstring(L, "_pointer");                // table key "_pointer"
+		lua_rawget(L, -3);                            // table key _pointer
+		Object *obj = (Object*)lua_touserdata(L, -1); // table key _pointer
+		lua_pop(L, 1);                                // table key
 
 		// Exit with error when the object pointer is NULL
 		if (!obj) {
@@ -673,9 +730,28 @@ int object_gettable(lua_State *L)
 		if (strcmp(index, "bitmap"   ) == 0) {putLuaArguments(L, "b", obj->bitmap          ); return 1;}
 
 		// None of the above, so deal with the value normally
-		lua_rawget(L, -2);
-		lua_remove(L, -2);
-		return 1;
+		/*
+		local h = table._class
+		if h == nil then return nil end
+		if type(h) == "function" then return h(table, key)        -- call the handler
+		else return h[key] end                                    -- or repeat operation on it
+		*/
+		lua_pushstring(L, "_class");                  // table key "_class"
+		lua_rawget(L, -3);                            // table key _class
+		if (lua_isnil(L, -1)) return 0;
+		else if (lua_isfunction(L, -1)) {
+			// Call the handler
+			lua_insert(L, 1);                         // _class table key
+			lua_call(L, 2, 1);                        // result
+			return 1;
+		}
+		else {
+			// Repeat operation on it
+			lua_insert(L, -2);                        // table _class key
+			lua_remove(L, 1);                         // _class key
+			lua_gettable(L, -2);                      // value
+			return 1;
+		}
 	}
 	else
 	{
@@ -723,7 +799,7 @@ int object_settable(lua_State *L)
 		else if (strcmp(index, "travel"   ) == 0) {obj->travel           = (int)lua_tonumber(L, -1);}
 		else if (strcmp(index, "bitmap"   ) == 0) {obj->bitmap           = (BITMAP*)lua_touserdata(L, -1);}
 		else {
-            // Deal with the assigned value normally
+			// Deal with the assigned value normally
 			lua_rawset(L, -3);
 		}
 	}
