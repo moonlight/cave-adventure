@@ -387,21 +387,26 @@ void getLuaArguments(lua_State *L, const char *args, ...)
 int l_alert(lua_State *L)
 {
 	lua_Debug ar;
-	lua_getstack(L, 0, &ar);
-	lua_getinfo(L, "nSl", &ar);
-	const char *error = lua_tostring(L, -1);
+	char error[1024] = "";
+	char error_line[256] = "";
+	int level = 0;
 
-	console.log(CON_QUIT, CON_ALWAYS, "An error occured in a Lua script:\n %s\n", error);
-	/*
-	console.log(
-		CON_QUIT, CON_ALWAYS,
-		"An error occured in a Lua script:\n"
-		" %s\n"
-		"Stack traceback:\n"
-		" 0: %s %s function `%s' at line %d %s",
-		error, ar->namewhat, ar->what, ar->name, ar->currentline, ar->short_src
-	);
-	*/
+	strcat(error, lua_tostring(L, -1));
+	strcat(error, "\n\nStack traceback:\n");
+
+	while (lua_getstack(L, level, &ar) != 0)
+	{
+		lua_getinfo(L, "nSl", &ar);
+		sprintf(
+			error_line,
+			" %d: function `%s' at line %d %s\n",
+			level, /*ar.namewhat, ar.what, */ar.name, ar.currentline, ar.short_src
+		);
+		strcat(error, error_line);
+		level++;
+	}
+
+	console.log(CON_QUIT, CON_ALWAYS, "An error occured in a Lua script:\n %s", error);
 	return 0;
 }
 
