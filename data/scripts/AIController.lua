@@ -1,6 +1,6 @@
 --
--- Controls the behaviour of a Pawn
--- By Bjørn Lindeijer
+-- Controls the behaviour of an enemy Pawn
+-- By Bjorn Lindeijer
 
 import("Controller.lua")
 
@@ -10,31 +10,49 @@ AIController = Controller:subclass
 	name = "AIController";
 
 	tick = function(self)
-		if (self.pawn.charge > 0) then self.pawn.charge = self.pawn.charge - 1 end
+		if (self.pawn.charging > 0) then self.pawn.charging = self.pawn.charging - 1 end
 
-		-- Switch to ready from walking
-		if (self.pawn.state == AI_WALKING and self.pawn.walking == 0) then
-			self.pawn:setState(AI_READY)
+		if (self.target and (self.target.map ~= self.pawn.map or self.target.bDead)) then
+			-- Abort target
+			self.target = nil
 		end
 
-		-- When an AI is ready, it's waiting for something to happen to take action
-		if (self.pawn.state == AI_READY) then
-			-- Check if player is drawing near
-			local playerDist = playerDistance(self.pawn)
-			local player = m_get_player()
+		-- When my pawn is ready, it's waiting for something to happen to take action
+		if (self.pawn.bAttacking == false and self.target) then
+			-- Check if target is drawing near
+			local targetDist = self.pawn:distanceTo(self.target)
+			local targetDir  = self.pawn:directionTo(self.target)
 
-			if (playerDist < 5 and player.state ~= CHR_DEAD) then
+			if (targetDist < 5) then
 				-- Chase or attack?
-				if (playerDist <= self.pawn.attack_range) then
+				if (targetDist == 1) then
 					-- Attack on charged
-					if (self.pawn.charge == 0 and self.pawn.walking == 0) then
-						self.pawn.dir = playerDirection(self.pawn)
+					if (self.pawn.charging == 0 and self.pawn.walking == 0) then
+						self.pawn.dir = targetDir
 						self.pawn:attack()
 					end
 				else
-					self.pawn:walk(playerDirection(self.pawn))
+					-- TODO: Enhance walking to target algorithm
+					if (self.pawn.walking == 0) then
+						self.pawn:walk(targetDir)
+					end
 				end
+			elseif (targetDist > 15) then
+				-- Abort target
+				self.target = nil
 			end
+		end
+	end;
+
+	notifyHearNoise = function(self, loudness, noiseMaker)
+		if (noiseMaker:instanceOf(Player) and (not self.target or self.pawn:distanceTo(self.target) > self.pawn:distanceTo(noiseMaker))) then
+			self.target = noiseMaker
+		end
+	end;
+
+	notifyTakeDamage = function(self, damage, instigator, damageType, momentum, location)
+		if (instigator) then
+			self.target = instigator
 		end
 	end;
 }
