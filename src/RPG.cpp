@@ -170,7 +170,7 @@ void init_engine()
 	}
 
 	// Set font to use
-	DATAFILE *temp = find_datafile_object(interface_graphics, "Terminal");
+	DATAFILE *temp = find_datafile_object(interface_graphics, "SmallFont");
 	if (temp) {engine_font = ((FONT *)temp->dat);}
 
 	console.log(CON_LOG, CON_ALWAYS, "Loading data.dat...");

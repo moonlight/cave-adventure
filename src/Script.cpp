@@ -17,9 +17,14 @@
 #include "Sound.h"
 #include "Script.h"
 #include "Canvas.h"
+#include <set>
+
+using std::set;
 
 
 lua_State* L = NULL;
+set<const char*, ltstr> loadedScripts;
+
 
 char lua_include[] =
 "function inherit(to, from)					\n"
@@ -46,30 +51,41 @@ int load_level;
 
 //===================   The engine to script interface   ============================/
 
-int l_import(lua_State *L)
+void import(const char *name)
 {
-	load_level++;
 	char *spaces = (char*)malloc((load_level + 1) * sizeof(char));
-	for (int i = 0; i < load_level; i++) spaces[i] = ' ';
+	int i;
+	for (i = 0; i < load_level; i++) spaces[i] = ' ';
 	spaces[load_level] = '\0';
 
-	const char* name = luaL_checkstring(L, 1);
 	DATAFILE *found_object = find_datafile_object(bitmap_data, name);
 
 	if (found_object && found_object->type == DAT_LUA) {
-		console.log(CON_LOG, CON_ALWAYS, "%s> \"%s\"", spaces, name);
-		//handleLuaError(luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name), name);
-		if (luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name)) {
-			lua_error(L);
+		const char* datname = get_datafile_property(found_object, DAT_NAME);
+
+		if (loadedScripts.find(datname) == loadedScripts.end()) {
+			loadedScripts.insert(datname);
+
+			console.log(CON_LOG, CON_ALWAYS, "%s> \"%s\"", spaces, name);
+			//handleLuaError(luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name), name);
+			if (luaL_loadbuffer(L, (char*)found_object->dat, found_object->size, name)) {
+				lua_error(L);
+			}
+			load_level++;
+			lua_call(L, 0, 0);  /* call main */
+			load_level--;
 		}
-		lua_call(L, 0, 0);  /* call main */
 	}
 	else {
 		console.log(CON_LOG, CON_ALWAYS, "%sX \"%s\" not found!", spaces, name);
 	}
 
 	free(spaces);
-	load_level--;
+}
+
+int l_import(lua_State *L)
+{
+	import(luaL_checkstring(L, 1));
 	return 0;
 }
 
@@ -164,12 +180,8 @@ void initScripting()
 	for (i = 0; bitmap_data[i].type != DAT_END; i++) {
 		name = get_datafile_property(bitmap_data+i, DAT_NAME);
 		if (bitmap_data[i].type == DAT_LUA) {
-			console.log(CON_LOG, CON_ALWAYS, "> \"%s\"", name);
 			load_level = 0;
-			if (luaL_loadbuffer(L, (char*)bitmap_data[i].dat, bitmap_data[i].size, name)) {
-				lua_error(L);
-			}
-			lua_call(L, 0, 0);  /* call main */
+			import(name);
 		}
 	}
 

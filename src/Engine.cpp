@@ -235,7 +235,7 @@ void Object::update()
 		count++;
 		if (count >= tick) {
 			// Call script "tick" function
-			callMemberFunction(tableRef, "event_tick");
+			callMemberFunction(tableRef, "tick");
 			count = 0;
 		}
 	} else {
