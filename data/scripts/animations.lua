@@ -21,11 +21,13 @@ function add_animations()
 	player_anim = frode_anim
 
 	-- Other animations
-	z_anim = extr_array(m_get_bitmap("z.tga"), 24, 24)
 	blood_splat_anim = extr_array(m_get_bitmap("blood_splat.bmp"), 16, 16)
 	blood_splat_green_anim = extr_array(m_get_bitmap("blood_splat_green.bmp"), 16, 16)
 	blood_splat_yellow_anim = extr_array(m_get_bitmap("blood_splat_yellow.bmp"), 16, 16)
 end
+
+-- A global array for animation storage
+anims = {}
 
 
 --

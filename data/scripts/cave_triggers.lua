@@ -17,7 +17,7 @@ function CaveFallingAsleep:event_stand_on(instigator)
 		instigator:take_damage(100)
 		return
 	end
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		-- The player gets tired and is going to get some rest in a quiet corner.
 		ActionConversation(conv.YAWN_TIRED),
 		ActionExModeOn(),
@@ -143,7 +143,7 @@ function CaveNoticeStrong:event_stand_on(instigator)
 		instigator:take_damage(100)
 		return
 	end
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		-- The player arrives at two cavemen guards. They are impressed by
 		-- his escape and tell him the story about their slavedriver, asking
 		-- the player to kill him.

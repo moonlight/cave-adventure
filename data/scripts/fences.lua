@@ -97,7 +97,7 @@ end
 function FenceG:event_activate(instigator)
 	if (self.first_time == 1) then
 		self.first_time = 0
-		SeqControl:add_sequence({
+		ActionController:addSequence({
 			ActionExModeOn(),
 			ActionConversation(conv.YEAH_RIGHT),
 			ActionSetState(self, FENCE_OPEN),

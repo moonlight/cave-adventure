@@ -56,7 +56,7 @@ function EnemyBoss:do_death()
 	-- BIG BOSS DIES SEQUENCE ADDED HERE!!!
 	--
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionAddSequence({
 			ActionSetVariable(self, "draw_mode", DM_TRANS),
 			ActionSetVariable(self, "goal_z", 0),
@@ -108,7 +108,7 @@ function BossFightTrigger:event_stand_on(obj)
 	if (player == obj and not boss_triggered) then
 		boss_triggered = 1
 
-		SeqControl:add_sequence({
+		ActionController:addSequence({
 			ActionExModeOn(),
 			ActionSetVariable(camera, "target", self),
 			ActionChangeDirection(player, DIR_UP),

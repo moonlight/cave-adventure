@@ -68,6 +68,8 @@ JumpingBox = Decoration:subclass
 
 CDs = Decoration:subclass
 {
+	name = "CDs";
+
 	defaultproperties = {
 		bitmap = m_get_bitmap("cds.tga"),
 		draw_mode = DM_ALPHA,

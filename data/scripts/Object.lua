@@ -13,7 +13,7 @@ Object =
 	--
 
 	-- Creates a new instance of this class
-	new = function(self, callInit)
+	new = function(self, ...)
 		if (self._instance) then error("new() called on instance, should be called on class.") end
 
 		m_message("Creating new "..self.name)
@@ -22,11 +22,9 @@ Object =
 		obj._class = self
 		obj._instance = true
 
-		if ((callInit or callInit == nil)) then
-			-- Assign default properties
-			for key, value in pairs(self.defaultproperties) do obj[key] = value; end
-			if (obj.init) then obj:init(); end
-		end
+		-- Assign default properties
+		for key, value in pairs(self.defaultproperties) do obj[key] = value; end
+		if (obj.init) then obj:init(unpack(arg)); end
 
 		return obj
 	end;
@@ -35,14 +33,17 @@ Object =
 	subclass = function(self, t)
 		if (self._instance) then error("subclass() called on instance, should be called on class.") end
 		if (type(t) ~= "table") then error("subclass() called on class ".. self.name .." with nil value.") end
+		if (not rawget(t, "name")) then error("subclass() called with a class without a name.") end
 
 		-- Set metatable to handle the inheritance
 		setmetatable(t, {
 			__index = self;
+
+			-- Allow object instaniation by calling the class like a function
 			__call = function(func, ...)
 				obj = func:new(unpack(arg))
 				return obj
-			end
+			end;
 		})
 
 		-- Handle default properties

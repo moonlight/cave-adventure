@@ -10,7 +10,7 @@ import("Object.lua")
 -- Helper function for spawning an Actor at a specific position
 
 spawn = function(x, y, class)
-	obj = class()
+	obj = class:new()
 	obj.x = x
 	obj.y = y
 	return obj
@@ -27,8 +27,15 @@ Actor = Object:subclass
 	-- CLASS FUNCTIONS
 	--
 
+	-- Creates a new instance of this class
 	new = function(self, ...)
-		obj = Object.new(self, false)
+		if (self._instance) then error("new() called on instance, should be called on class.") end
+
+		m_message("Creating new "..self.name)
+		local obj = {}
+		setmetatable(obj, {__index = self})
+		obj._class = self
+		obj._instance = true
 
 		-- Setup the binding with the engine
 		m_register_object(obj)

@@ -1,12 +1,12 @@
 -- cave.lua
 -- Cave filling scripts
 
-import("Torch.lua")
-import("Spring.lua")
-
 
 function prepare_cave1()
 	spawn(56, 30, Spring)
+
+	local radio = spawn(54, 3, Radio)
+	radio.offset_y = radio.offset_y + 5
 
 	-- Spider webs
 	

@@ -15,7 +15,7 @@ function event_keypress(key)
 	if (key == "action") then
 		if (show_main_menu and not started) then
 			started = 1
-			SeqControl:add_sequence({
+			ActionController:addSequence({
 				ActionFadeOutMap(50),
 				ActionSetVariable(_G, "show_main_menu", nil),
 				ActionChangeMap("data/maps/cave1.map"),

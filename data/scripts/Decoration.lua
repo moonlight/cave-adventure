@@ -9,6 +9,8 @@ import("Animation.lua")
 
 Decoration = Actor:subclass
 {
+	name = "Decoration";
+
 	init = function(self)
 		if (self.animType) then
 			self.animInst = self.animType:new()

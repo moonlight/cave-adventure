@@ -93,7 +93,7 @@ function BossAI:event_tick()
 				local ty = self.area_min_y + math.random(self.area_max_y - self.area_min_y)
 				-- Do the teleport sequence
 				self:setState(BAI_PHASE)
-				self.teleport_sequence = SeqControl:add_sequence({
+				self.teleport_sequence = ActionController:addSequence({
 					ActionSetVariable(self, "draw_mode", DM_TRANS),
 					ActionTweenVariable(self, "alpha", 50, 0),
 					ActionSetPosition(self, tx, ty),
@@ -130,7 +130,7 @@ function BossAI:attack(dir)
 	-- Spawn the hitting effect (ie. sparks)
 	if (self.attack_object) then self:attack_object(player) end
 
-	SeqControl:add_sequence{
+	ActionController:addSequence{
 		ActionWait(self.attack_time),
 		ActionSetState(self, AI_READY),
 		ActionSetVariable(self, "charge", self.charge_time),
@@ -153,7 +153,7 @@ function BossAI:setState(state)
 
 	if (self.state == AI_DEAD) then
 		-- Get rid of any teleport sequences
-		SeqControl:remove_sequence(self.teleport_sequence)
+		ActionController:removeSequence(self.teleport_sequence)
 		--self.tick_time = 0
 		self:do_death()
 	end

@@ -2,6 +2,8 @@
 -- This file defines some global functions for the game.
 -- By Bjørn Lindeijer
 
+import("Player.lua")
+
 
 game = {
 	game_over = 0,
@@ -29,7 +31,7 @@ function event_init()
 	ConvBox:init()
 	HUD:initialize()
 	MusicControl:init()
-	CombatControl:init()
+	--CombatControl:init()
 	GUI:init()
 
 	-- Show startup screen
@@ -46,16 +48,16 @@ function event_init()
 		bm = m_get_bitmap("start.tga"),
 		y = 300,
 	}
-	SeqControl:add_sequence({
+	ActionController:addSequence{
 		ActionExModeOn(),
 		ActionTweenVariable(main_menu_bg, "alpha", 200, 255),
 		ActionTweenVariable(main_title, "y", 200, 184),
 		ActionTweenVariable(main_start, "y", 100, 220),
-	})
+	}
 
 
 	-- Spawn the player
-	player = m_add_object(-1, -1, "Player")
+	player = spawn(-1, -1, Player)
 	m_set_player(player)
 
 	camera.target = player
@@ -104,7 +106,7 @@ end
 function event_logic_update()
 	HUD:logic_update()
 	ConvBox:update()
-	SeqControl:update()
+	ActionController:update()
 	MusicControl:update()
 	--CombatControl:update()
 end

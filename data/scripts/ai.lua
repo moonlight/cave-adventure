@@ -128,7 +128,7 @@ function CommonAI:attack(dir)
 	-- Spawn the hitting effect (ie. sparks)
 	if (self.attack_object) then self:attack_object(player) end
 
-	SeqControl:add_sequence{
+	ActionController:addSequence{
 		ActionWait(self.attack_time),
 		ActionSetState(self, AI_READY),
 		ActionSetVariable(self, "charge", self.charge_time),
@@ -150,7 +150,7 @@ function CommonAI:setState(state)
 		if (self.do_death) then self:do_death()
 		else
 			self.animation = nil
-			SeqControl:add_sequence({
+			ActionController:addSequence({
 				ActionWait(100),
 				ActionSetVariable(self, "draw_mode", DM_TRANS),
 				ActionTweenVariable(self, "alpha", 200, 0),

@@ -102,7 +102,7 @@ function ConvBox:write_line(string)
 	table.insert(self.lines_todo, string)
 	if (self.state == CB_CLOSED) then
 		self.state = CB_SCALING
-		SeqControl:add_sequence{
+		ActionController:addSequence{
 			ActionExModeOn(),
 			ActionTweenVariable(self, "width", self.appear_time, 1),
 			ActionTweenVariable(self, "height", self.appear_time, 1),
@@ -159,7 +159,7 @@ function ConvBox:update()
 
 	elseif (self.state == CB_READY) then
 		-- Ready and no lines left todo
-		SeqControl:add_sequence{
+		ActionController:addSequence{
 			ActionSetVariable(self, "state", CB_SCALING),
 			ActionTweenVariable(self, "height", self.appear_time, 0),
 			ActionTweenVariable(self, "width", self.appear_time, 0),

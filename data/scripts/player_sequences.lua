@@ -15,7 +15,7 @@ function Buiten_Naar_Bos:event_stand_on(obj)
 	local player = m_get_player()
 	if obj ~= player or m_get_ex_mode() == 1 then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionWalk(player, DIR_RIGHT, 2),
 		ActionChangeMap("data/maps/bos.map"),
@@ -28,7 +28,7 @@ function Buiten_Naar_Bos:event_stand_on(obj)
 		ActionFadeInMap(50),
 	})
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionFadeOutMusic(50, 0),
 		ActionFadeOutMap(50),
 	})
@@ -39,7 +39,7 @@ function Bos_Naar_Buiten:event_stand_on(obj)
 
 	if obj ~= player or m_get_ex_mode() == 1 then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionWalk(player, DIR_LEFT, 2),
 		ActionChangeMap("data/maps/buiten.map"),
@@ -52,7 +52,7 @@ function Bos_Naar_Buiten:event_stand_on(obj)
 		ActionFadeInMap(50),
 	})
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionFadeOutMusic(50, 0),
 		ActionFadeOutMap(50),
 	})
@@ -70,7 +70,7 @@ function Buiten_Naar_Tent1:event_activate(instigator)
 	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
 	self.prev_random = n
 		
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionFadeOutMap(50),
 		ActionChangeMap("data/maps/tent1.map"),
 		ActionSetPosition(player, 7, 9, DIR_UP),
@@ -91,7 +91,7 @@ function Buiten_Naar_Tent2:event_activate(instigator)
 	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
 	self.prev_random = n
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionFadeOutMap(50),
 		ActionChangeMap("data/maps/tent1.map"),
 		ActionSetPosition(player, 21, 10, DIR_UP),
@@ -104,7 +104,7 @@ function Tent1_Naar_Buiten:event_stand_on(instigator)
 	local player = m_get_player()
 	if instigator ~= player then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionFadeOutMap(50),
 		ActionChangeMap("data/maps/buiten.map"),
@@ -118,7 +118,7 @@ function Tent2_Naar_Buiten:event_stand_on(instigator)
 	local player = m_get_player()
 	if instigator ~= player then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionFadeOutMap(50),
 		ActionChangeMap("data/maps/buiten.map"),
@@ -132,7 +132,7 @@ function Cave1_Naar_Cave2:event_stand_on(obj)
 	local player = m_get_player()
 	if obj ~= player or m_get_ex_mode() == 1 then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionAddSequence({
 			ActionWalk(player, DIR_LEFT, 1),
@@ -153,7 +153,7 @@ function Cave2_Naar_Cave1:event_stand_on(obj)
 	local player = m_get_player()
 	if obj ~= player or m_get_ex_mode() == 1 then return end
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionExModeOn(),
 		ActionAddSequence({
 			ActionWalk(player, DIR_RIGHT, 1),

@@ -1,28 +1,42 @@
 --
 -- Z (sleeping thingy)
 --
-Z = {}
 
-function Z:event_init()
-	inherit(self, BasicObject)
-	inherit(self, FrameDurationAni)
+import("Decoration.lua")
+import("animations.lua")
 
-	self:start_animation({
-		{z_anim[1],  10},
-		{z_anim[2],  1},
-		{z_anim[3],  2},
-		{z_anim[4],  2},
-		{z_anim[5],  1},
-		{z_anim[6],  1},
-		{z_anim[7],  2},
-		{z_anim[8],  2},
-		{z_anim[9],  1},
-		{z_anim[10], 1},
-		{z_anim[11], 1},
-	})
-	self.animation_speed = 0.2
 
-	--self.offset_y = -6
-	self.tick_time = 1
-	self.draw_mode = DM_ALPHA
-end
+Z = Decoration:subclass
+{
+	name = "Z";
+
+	init = function(self)
+		animSeq = {
+			{self.animBmps[1],  10},
+			{self.animBmps[2],  1},
+			{self.animBmps[3],  2},
+			{self.animBmps[4],  2},
+			{self.animBmps[5],  1},
+			{self.animBmps[6],  1},
+			{self.animBmps[7],  2},
+			{self.animBmps[8],  2},
+			{self.animBmps[9],  1},
+			{self.animBmps[10], 1},
+			{self.animBmps[11], 1},
+		},
+
+		Decoration.init(self)
+
+		self.animation.animation_speed = 0.2
+	end;
+
+	defaultproperties = {
+		animType = FrameDurationAni,
+		animBmps = extr_array(m_get_bitmap("z.tga"), 24, 24),
+		obstacle = 0,
+		--offset_y = -6,
+
+		tick_time = 1,
+		draw_mode = DM_ALPHA,
+	};
+}

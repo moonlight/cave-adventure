@@ -24,7 +24,7 @@ end
 function EnemySpider:do_death()
 	self.animation = nil
 	self.bitmap = m_get_bitmap("spider_dead.bmp")
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionWait(100),
 		ActionSetVariable(self, "draw_mode", DM_TRANS),
 		ActionTweenVariable(self, "alpha", 200, 0),
@@ -67,7 +67,7 @@ end
 function EnemyPoisonSpider:do_death()
 	self.animation = nil
 	self.bitmap = m_get_bitmap("spider2_dead.bmp")
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionWait(100),
 		ActionSetVariable(self, "draw_mode", DM_TRANS),
 		ActionTweenVariable(self, "alpha", 200, 0),
@@ -154,7 +154,7 @@ end
 function EnemyPoisonSpiderQueen:do_death()
 	self.animation = nil
 	self.bitmap = m_get_bitmap("spider3_dead.bmp")
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionWait(100),
 		ActionSetVariable(self, "draw_mode", DM_TRANS),
 		ActionTweenVariable(self, "alpha", 200, 0),
@@ -195,7 +195,7 @@ end
 function EnemySmallPoisonSpiderQueen:do_death()
 	self.animation = nil
 	self.bitmap = m_get_bitmap("spider_small_dead.bmp")
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionWait(100),
 		ActionSetVariable(self, "draw_mode", DM_TRANS),
 		ActionTweenVariable(self, "alpha", 200, 0),

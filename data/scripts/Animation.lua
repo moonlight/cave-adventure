@@ -67,9 +67,9 @@ LinearAni = Animation:subclass
 	end;
 
 	defaultproperties = {
-		--animation = {},
-		--animation_count = 1,
-		--animation_speed = 1,
+		animation = {},
+		animation_count = 1,
+		animation_speed = 1,
 	};
 	animation = {};
 	animation_count = 1;
@@ -78,124 +78,164 @@ LinearAni = Animation:subclass
 
 
 -- RANDOM FRAME ANIMATION
--- Every tick a math.random bitmap is chosen.
+-- Every tick a random bitmap is chosen.
 --
-RandomAni = {
-	animation = {},
-	prev_animation_frame = 0,
+RandomAni = Animation:subclass
+{
+	name = "RandomAni";
+
+	start_animation = function(self, animation)
+		self.animation = animation
+		self:update_bitmap()
+	end;
+
+	stop_animation = function(self)
+		self.animation = nil
+	end;
+
+	update_bitmap = function(self)
+		if (self.animation) then
+			local nr = table.getn(self.animation)
+			if (nr == 1) then
+				self.bitmap = self.animation[1]
+			elseif (nr > 1) then
+				repeat n = math.random(nr) until n ~= self.prev_animation_frame
+				self.prev_animation_frame = n
+				self.bitmap = self.animation[n]
+			end
+		end
+	end;
+
+	event_tick = function(self)
+		self:update_bitmap()
+	end;
+
+	defaultproperties = {
+		animation = {},
+		prev_animation_frame = 0,
+	};
+	animation = {};
+	prev_animation_frame = 0;
 }
 
-function RandomAni:start_animation(animation)
-	self.animation = animation
-	self:update_bitmap()
-end
-function RandomAni:stop_animation()
-	self.animation = nil
-end
-function RandomAni:update_bitmap()
-	if (self.animation) then
-		local nr = table.getn(self.animation)
-		if (nr == 1) then
-			self.bitmap = self.animation[1]
-		elseif (nr > 1) then
-			repeat n = math.random(nr) until n ~= self.prev_animation_frame
-			self.prev_animation_frame = n
-			self.bitmap = self.animation[n]
-		end
-	end
-end
-function RandomAni:event_tick()
-	self:update_bitmap()
-end
 
 
 -- FRAMES WITH DURATION ANIMATION
 -- A more advanced animation system, in which you have to specify how long
 -- each frame is displayed.
 --
-FrameDurationAni = {
-	animation = {},
-	animation_count = 1,
-	animation_speed = 1,
-	frame_count = 1
-}
+FrameDurationAni = Animation:subclass
+{
+	name = "FrameDurationAni";
 
-function FrameDurationAni:start_animation(animation)
-	self.animation = animation
-	self.animation_count = 1
-	self.frame_count = 1
-	self:update_bitmap()
-end
-function FrameDurationAni:stop_animation()
-	self.animation = nil
-end
-function FrameDurationAni:update_bitmap()
-	if (self.animation and table.getn(self.animation) > 0) then
-		while (self.animation and table.getn(self.animation) > 0 and self.frame_count > self.animation[self.animation_count][2]) do
-			self.frame_count = self.frame_count - self.animation[self.animation_count][2]
-			self.animation_count = self.animation_count + 1
+	start_animation = function(self, animation)
+		self.animation = animation
+		self.animation_count = 1
+		self.frame_count = 1
+		self:update_bitmap()
+	end;
 
-			if (self.animation_count > table.getn(self.animation)) then
-				self.animation_count = 1
+	stop_animation = function(self)
+		self.animation = nil
+	end;
 
-				if (self.animation_finished) then
-					self:animation_finished()
+	update_bitmap = function(self)
+		if (self.animation and table.getn(self.animation) > 0) then
+			while (self.animation and table.getn(self.animation) > 0 and self.frame_count > self.animation[self.animation_count][2]) do
+				self.frame_count = self.frame_count - self.animation[self.animation_count][2]
+				self.animation_count = self.animation_count + 1
+
+				if (self.animation_count > table.getn(self.animation)) then
+					self.animation_count = 1
+
+					if (self.animation_finished) then
+						self:animation_finished()
+					end
 				end
 			end
-		end
 
-		if (self.animation and table.getn(self.animation) > 0) then
-			self.bitmap = self.animation[self.animation_count][1]
-		end
+			if (self.animation and table.getn(self.animation) > 0) then
+				self.bitmap = self.animation[self.animation_count][1]
+			end
 
-		self.frame_count = self.frame_count + self.animation_speed
-	end
-end
-function FrameDurationAni:event_tick()
-	self:update_bitmap()
-end
+			self.frame_count = self.frame_count + self.animation_speed
+		end
+	end;
+
+	event_tick = function(self)
+		self:update_bitmap()
+	end;
+
+
+	defaultproperties = {
+		animation = {},
+		animation_count = 1,
+		animation_speed = 1,
+		frame_count = 1,
+	};
+	animation = {};
+	animation_count = 1;
+	animation_speed = 1;
+	frame_count = 1;
+}
+
 
 
 -- BASIC CHARACTER ANIMATION
 -- Switches leg every tile and adapts to character direction.
 --
-BasicCharAni = {
-	leg_used = 0,
-	tick_time = 1,
-	walking = 0,
-}
+BasicCharAni = Animation:subclass
+{
+	name = "BasicCharAni";
 
-function BasicCharAni:start_animation(animation)
-	self.animation = animation
-	self:update_bitmap()
-end
-function BasicCharAni:update_bitmap()
-	local ani = self.animation
-	if (ani) then
-		if (self.attacking == 1) then
-			self.bitmap = ani[self.dir + 1 + 3 * 4]
-		else
-			if (self.walking == 0 or self.walking < 50) then
-				self.bitmap = ani[self.dir + 1]
+	start_animation = function(self, animation)
+		self.animation = animation
+		self:update_bitmap()
+	end;
+
+	update_bitmap = function(self)
+		local ani = self.animation
+		if (ani) then
+			if (self.attacking == 1) then
+				self.bitmap = ani[self.dir + 1 + 3 * 4]
 			else
-				self.bitmap = ani[self.dir + 1 + (self.leg_used + 1) * 4]
+				if (self.walking == 0 or self.walking < 50) then
+					self.bitmap = ani[self.dir + 1]
+				else
+					self.bitmap = ani[self.dir + 1 + (self.leg_used + 1) * 4]
+				end
 			end
 		end
-	end
-end
-function BasicCharAni:event_walk_start()
-	self.leg_used = 1 - self.leg_used
-	--self.tick_time = 1
-end
-function BasicCharAni:event_walk_finished()
-	self:update_bitmap()
-	--self.tick_time = 0
-end
-function BasicCharAni:event_dir_change()
-	self:update_bitmap()
-end
-function BasicCharAni:event_tick()
-	self:update_bitmap()
-end
+	end;
+
+	event_walk_start = function(self)
+		self.leg_used = 1 - self.leg_used
+		--self.tick_time = 1
+	end;
+
+	event_walk_finished = function(self)
+		self:update_bitmap()
+		--self.tick_time = 0
+	end;
+
+	event_dir_change = function(self)
+		self:update_bitmap()
+	end;
+
+	event_tick = function(self)
+		self:update_bitmap()
+	end;
+
+
+	defaultproperties = {
+		leg_used = 0,
+		tick_time = 1,
+		walking = 0,
+	};
+	leg_used = 0;
+	tick_time = 1;
+	walking = 0;
+}
+
 
 

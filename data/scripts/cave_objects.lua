@@ -138,7 +138,7 @@ CavePile = Decoration:subclass
 
 	event_activate = function(self, instigator)
 		if (picked_up_pick) then
-			SeqControl:add_sequence({
+			ActionController:addSequence({
 				ActionExModeOn(),
 				ActionConversation(conv.USE_PICKAXE),
 				ActionFadeOutMap(100),
@@ -150,7 +150,7 @@ CavePile = Decoration:subclass
 				ActionExModeOff(),
 			})
 		else
-			SeqControl:add_sequence({
+			ActionController:addSequence({
 				ActionConversation(conv.PILE_WONT_BUDGE),
 			})
 		end
@@ -185,8 +185,8 @@ end
 function CavePick:event_activate(obj)
 	picked_up_pick = 1
 	m_destroy_object(self)
-		SeqControl:add_sequence({
-			ActionConversation(conv.PICKUP_PICKAXE)
-		})
+	ActionController:addSequence({
+		ActionConversation(conv.PICKUP_PICKAXE)
+	})
 end
 

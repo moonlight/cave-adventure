@@ -1,5 +1,6 @@
--- Torch.lua
+--
 -- A torch by Frode
+--
 
 import("Decoration.lua")
 import("lang.lua")

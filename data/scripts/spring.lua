@@ -1,5 +1,6 @@
--- Spring.lua
+--
 -- The spring by Frode
+--
 
 import("Decoration.lua")
 import("lang.lua")
@@ -7,11 +8,13 @@ import("lang.lua")
 
 Spring = Decoration:subclass
 {
+	name = "Spring";
+
 	event_activate = function(self, instigator)
 		Decoration.event_activate(self, instigator)
 
 		if (instigator.health < instigator.maxHealth) then
-			SeqControl:add_sequence({
+			ActionController:addSequence({
 				ActionTweenVariable(instigator, "health", 2*(instigator.maxHealth - instigator.health), instigator.maxHealth),
 			})
 		end

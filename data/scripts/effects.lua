@@ -27,7 +27,7 @@ function ShootPoison(from_obj, to_obj)
 	local blob = m_add_object(from_obj.x, from_obj.y, "PoisonProjectile")
 	blob.offset_y = from_obj.offset_y - 5
 
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionAddSequence{
 			ActionTweenVariable(blob, "offset_x", 50, (to_obj.x - from_obj.x) * 24, from_obj.offset_x)
 		},

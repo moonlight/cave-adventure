@@ -26,7 +26,7 @@ function Rat:do_death()
 
 	self.animation = nil
 	self.bitmap = m_get_bitmap("rat_dead.bmp")
-	SeqControl:add_sequence({
+	ActionController:addSequence({
 		ActionWait(100),
 		ActionSetVariable(self, "draw_mode", DM_TRANS),
 		ActionTweenVariable(self, "alpha", 200, 0),
