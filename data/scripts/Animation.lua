@@ -1,8 +1,9 @@
--- Animation.lua
+--
 -- All animation schemes should inherit from this basic structure, exposing
 -- start, stop and update features and making the bitmap accesible through
 -- a bitmap member variable.
--- By Bjørn Lindeijer
+--
+-- By Bjorn Lindeijer
 
 import("Object.lua")
 

@@ -1,7 +1,7 @@
 --
 -- A modification of the general AIController, to take care
 -- of the queens ability to give birth.
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
 import("AIController.lua")
 
@@ -23,7 +23,7 @@ QueenController = AIController:subclass
 		if (self.pawn.state == AI_READY) then
 			-- Check if player is drawing near
 			playerDist = playerDistance(self.pawn)
-			local player = m_get_player()
+			--local player = m_get_player()
 
 			if (playerDist < 5 and player.state ~= CHR_DEAD) then
 				local space = randomFreeTileAround(self.pawn)

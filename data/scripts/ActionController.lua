@@ -3,12 +3,13 @@
 -- can add actions to the controller, which will execute in
 -- parralel. The actions are defined elsewhere.
 --
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
 ActionController =
 {
 	-- A wrapper to put a sequence of actions automatically in a sequence.
 	addSequence = function(self, seq)
+		if (not seq) then m_message("Warning: addSequence called with nil as sequence."); return end
 		return self:addAction(ActionSequence(seq))
 	end;
 
@@ -33,11 +34,14 @@ ActionController =
 
 	-- Removes the specified sequence/action according to the execution environment.
 	removeSequence = function(self, execEnv)
-		if (execEnv) then
-			for i = 1, table.getn(self.actions) do
-				if (self.actions[i] == seq) then
-					table.remove(self.actions, i)
-				end
+		local i
+
+		-- Execute all running actions
+		for i = 1, table.getn(self.actions) do
+			if (i <= table.getn(self.actions) and self.actions[i] == execEnv) then
+				m_message("Finished executing "..self.actions[i].name .." (".. self.actions[i]._id ..")")
+				table.remove(self.actions, i)
+				i = i - 1
 			end
 		end
 	end;

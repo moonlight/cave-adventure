@@ -16,7 +16,7 @@ Object =
 	new = function(self, ...)
 		if (self._instance) then error("new() called on instance, should be called on class.") end
 
-		m_message("Creating new "..self.name)
+		--m_message("Creating new "..self.name)
 		local obj = {}
 		setmetatable(obj, {__index = self})
 		obj._class = self
@@ -56,6 +56,17 @@ Object =
 		return t
 	end;
 
+	-- Checks whether this class is a subclass of a given class
+	subclassOf = function(self, t)
+		if (self._instance) then error("subclassOf() called on instance, should be called on class.") end
+		local class = self
+		while (class) do
+			if (class == t) then return true end
+			class = class._superclass
+		end
+		return false
+	end;
+
 
 	--
 	-- OBJECT FUNCTIONS
@@ -71,6 +82,30 @@ Object =
 		end
 
 		return false
+	end;
+
+
+	-- Writes a message to the log and console
+	log = function(self, message)
+		if (self._instance) then
+			m_message(self:toString()..": "..message)
+		else
+			m_message(self.name..": "..message)
+		end
+	end;
+
+	-- Makes a recognizable string
+	toString = function(self)
+		return self.name
+	end;
+
+	-- Return the oposite direction to the given direction
+	reverseDirection = function(self, dir)
+		if (not dir) then dir = self.dir end
+		if (dir == DIR_LEFT)  then return DIR_RIGHT end
+		if (dir == DIR_RIGHT) then return DIR_LEFT  end
+		if (dir == DIR_UP)    then return DIR_DOWN  end
+		if (dir == DIR_DOWN)  then return DIR_UP    end
 	end;
 
 

@@ -57,9 +57,9 @@ FenceG = Fence:subclass
 			self.first_time = 0
 			ActionController:addSequence({
 				ActionExModeOn(),
-				ActionConversation(conv.YEAH_RIGHT),
+				ActionConversation(lang:getConv("YEAH_RIGHT")),
 				ActionSetState(self, FENCE_OPEN),
-				ActionConversation(conv.NOT_LOCKED),
+				ActionConversation(lang:getConv("NOT_LOCKED")),
 				ActionSetState(caveman_guard1, AI_READY),
 				ActionSetState(caveman_guard2, AI_READY),
 				ActionSetState(caveman_guard3, AI_READY),

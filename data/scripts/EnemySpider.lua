@@ -1,54 +1,21 @@
 -- Some spiders
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
-import("Character.lua")
+import("Enemy.lua")
 import("AIController.lua")
 import("QueenController.lua")
 import("effects.lua")
 
 
-EnemySpider = Character:subclass
+EnemySpider = Enemy:subclass
 {
 	name = "EnemySpider";
 
-	takeDamage = function(self, damage, instigator, damageType, momentum, location)
-		m_message("Spider took ".. damage .." damage")
-		if (self.state ~= AI_DEAD) then
-			Character.takeDamage(self, damage, instigator, damageType, momentum, location)
-			if (damage > 0) then
-				local obj = self:spawn(self.hitEffectClass, self.x, self.y)
-				obj.offset_z = obj.offset_z + 12
-			end
-		end
-	end;
-
-	died = function(self, killer, damageType, location)
-		self:setState(AI_DEAD)
-		local player = m_get_player()
-
-		player.experience = player.experience + self.experience
-		if (player.experience >= player.nextLevelExperience) then
-			player.endurance = player.endurance + 5
-			player.nextLevelExperience = 2.5 * player.nextLevelExperience
-			player:derive_attributes()
-		end
-
-		self.charAnim = nil
-		self.bitmap = self.deathBitmap
-		ActionController:addSequence({
-			ActionWait(100),
-			ActionSetVariable(self, "draw_mode", DM_TRANS),
-			ActionTweenVariable(self, "alpha", 200, 0),
-			ActionDestroyObject(self),
-		})
-
-		self.tick_time = 0
-	end;
-
+	--[[
 	attack = function(self)
 		--m_message("AI attacking!");
 		self:setState(AI_ATTACK)
-		local player = m_get_player()
+		--local player = m_get_player()
 
 		-- Handle attack (deal damage to player)
 		player:takeDamage(self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))
@@ -62,37 +29,27 @@ EnemySpider = Character:subclass
 			ActionSetVariable(self, "charge", self.charge_time),
 		}
 	end;
-
-	walk = function(self, dir)
-		Character.walk(self, dir)
-		self:setState(AI_WALKING)
-	end;
-
-	setState = function(self, state)
-		self.state = state
-		
-		if (self.state == AI_ATTACK) then self.attacking = 1 else self.attacking = 0 end
-		self:updateBitmap()
-	end;
+	]]
 
 	defaultproperties = {
-		state = AI_READY,
-		tick_time = 1,
+		offset_y = 6,
 
 		experience = 8,
 		speed = 3,
 		maxHealth = 25,
-		charge_time = 200,
+		chargeTime = 200,
 		charge = 0,
 		attack_range = 1,
-		attack_time = 50,
+		attackTime = 50,
 		attack_min_dam = 1,
 		attack_max_dam = 3,
 
 		draw_mode = DM_MASKED,
 		charAnim = extr_char_anim(m_get_bitmap("spider.bmp"), 24, 24),
 		deathBitmap = m_get_bitmap("spider_dead.bmp"),
+
 		hitEffectClass = BloodSplatGreen,
+		hitEffectHeight = 8,
 
 		controllerClass = AIController,
 	};
@@ -110,7 +67,18 @@ EnemyPoisonSpider = EnemySpider:subclass
 	name = "EnemyPoisonSpider";
 
 	attack_object = function(self, obj)
-		ShootPoison(self, obj)
+		local blob = self:spawn(PoisonProjectile, self.x, self.y)
+		blob.offset_y = self.offset_y - 5
+
+		ActionController:addSequence({
+			ActionAddSequence{
+				ActionTweenVariable(blob, "offset_x", 50, (obj.x - self.x) * 24, self.offset_x)
+			},
+			ActionAddSequence{
+				ActionTweenVariable(blob, "offset_y", 50, (obj.y - self.y) * 24 - 15, self.offset_y - 5),
+				ActionDestroyObject(blob),
+			},
+		})
 	end;
 
 	defaultproperties = {
@@ -137,7 +105,18 @@ EnemyPoisonSpiderQueen = EnemySpider:subclass
 	name = "EnemyPoisonSpiderQueen";
 
 	attack_object = function(self, obj)
-		ShootPoison(self, obj)
+		local blob = self:spawn(PoisonProjectile, self.x, self.y)
+		blob.offset_y = self.offset_y - 5
+
+		ActionController:addSequence({
+			ActionAddSequence{
+				ActionTweenVariable(blob, "offset_x", 50, (obj.x - self.x) * 24, self.offset_x)
+			},
+			ActionAddSequence{
+				ActionTweenVariable(blob, "offset_y", 50, (obj.y - self.y) * 24 - 15, self.offset_y - 5),
+				ActionDestroyObject(blob),
+			},
+		})
 	end;
 
 	give_birth = function(self, dir)

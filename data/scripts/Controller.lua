@@ -15,7 +15,7 @@
 --
 -- This class is heavily based upon the architecture of the Unreal Engine.
 --
--- By Bjørn Lindeijer
+-- By Bjorn Lindeijer
 
 import("Object.lua")
 
@@ -47,6 +47,16 @@ Controller = Object:subclass
 
 	notifyHearNoise = function(self, loadness, noiseMaker)
 	end;
+
+	notifyBumpInto = function(self, obj)
+	end;
+
+	notifyBumpedInto = function(self, obj)
+	end;
+
+	notifyWalkFinished = function(self)
+	end;
+
 
 	tick = function(self)
 	end;
