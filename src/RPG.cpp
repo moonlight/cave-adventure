@@ -101,7 +101,7 @@ void init_engine()
 	debug_mode += (get_config_int("Engine", "DebugVerbose", 0)) ? 1 : 0;
 
 	int driver = GFX_AUTODETECT_WINDOWED;
-	if (get_config_int("Engine", "Fullscreen", 1)) {
+	if (get_config_int("Engine", "Fullscreen", 0)) {
 		driver = GFX_AUTODETECT_FULLSCREEN;
 	}
 
@@ -166,7 +166,7 @@ void init_engine()
 		false, false
 	);
 
-	console.log(CON_LOG, CON_ALWAYS, "Loading gui.dat...");
+ 	console.log(CON_LOG, CON_ALWAYS, "Loading gui.dat...");
 	interface_graphics = load_datafile("gui.dat");
 	if (!interface_graphics) {
 		console.log(CON_QUIT, CON_ALWAYS, "Error while loading: gui.dat");

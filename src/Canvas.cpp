@@ -98,7 +98,14 @@ void Canvas::drawText(const char *text)
 
 void Canvas::drawBitmap(BITMAP *bmp, int dw, int dh, int sx, int sy, int sw, int sh)
 {
-	//console.log(CON_LOG | CON_CONSOLE, CON_DEBUG, "Processing draw_bitmap(bmp, %d, %d, %d, %d, %d, %d)", dw, dh, sx, sy, sw, sh);
+	/*
+	console.log(
+		CON_LOG | CON_CONSOLE,
+		CON_DEBUG,
+		"Processing draw_bitmap(bmp, %d, %d, %d, %d, %d, %d)",
+		dw, dh, sx, sy, sw, sh
+	);
+	*/
 	ASSERT(bitmap);
 	BITMAP *src = NULL;
 
