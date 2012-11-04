@@ -65,7 +65,7 @@ function Buiten_Naar_Tent1:activatedBy(instigator)
 		{{"Frode", "It's a mess inside."}},
 	}
 
-	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
+	repeat n = math.random(#text_table) until (n ~= self.prev_random)
 	self.prev_random = n
 		
 	ActionController:addSequence({
@@ -88,7 +88,7 @@ function Buiten_Naar_Tent2:activatedBy(instigator)
 		{{"Frode", "It's a terrible mess inside."}},
 	}
 
-	repeat n = math.random(table.getn(text_table)) until (n ~= self.prev_random)
+	repeat n = math.random(#text_table) until (n ~= self.prev_random)
 	self.prev_random = n
 
 	ActionController:addSequence({

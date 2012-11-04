@@ -57,8 +57,8 @@ Pawn = Actor:subclass
 			end
 
 			-- A scream perhaps?
-			if (table.getn(self.hitSounds) > 0) then
-				local sampleFile = self.hitSounds[math.random(table.getn(self.hitSounds))]
+			if (#self.hitSounds > 0) then
+				local sampleFile = self.hitSounds[math.random(#self.hitSounds)]
 				m_play_sample(sampleFile)
 			end
 

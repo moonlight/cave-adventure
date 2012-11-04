@@ -24,7 +24,7 @@ Enemy = Character:subclass
 			local damage = self.attackMinDam + math.random(self.attackMaxDam - self.attackMinDam)
 
 			-- Deal damage
-			for index, object in attackedObjs do
+			for index, object in ipairs(attackedObjs) do
 				if (object:instanceOf(Actor)) then
 					object:takeDamage(damage, self)
 				end

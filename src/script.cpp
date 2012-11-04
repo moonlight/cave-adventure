@@ -186,7 +186,7 @@ void initScripting()
 	lua_register(L, "m_update_input",   l_update_input);
 	lua_register(L, "m_get_shift",      l_get_shift);
 
-	handleLuaError(lua_dostring(L, lua_include), "lua_include");
+	handleLuaError(luaL_dostring(L, lua_include), "lua_include");
 
 
 

@@ -46,11 +46,11 @@ PlayerSwitcher = Interaction:subclass
 		else
 			table.remove(self.playerHosts, iIndex)
 			if (iIndex == self.currentHost) then
-				if (self.currentHost > table.getn(self.playerHosts)) then
+				if (self.currentHost > #self.playerHosts) then
 					self.currentHost = 1
 				end
 
-				if (table.getn(self.playerHosts) > 0) then
+				if #self.playerHosts > 0 then
 					self:selectPlayerHost(self.playerHosts[self.currentHost])
 				else
 					self.playerController:unPossess()
@@ -83,7 +83,7 @@ PlayerSwitcher = Interaction:subclass
 
 		-- Search for the Interaction
 		iIndex = -1;
-		for i = 1, table.getn(self.playerHosts) do
+		for i = 1, #self.playerHosts do
 			if (self.playerHosts[i] == playerHost) then
 				iIndex = i
 			end
@@ -93,17 +93,17 @@ PlayerSwitcher = Interaction:subclass
 	end;
 
 	keyType = function(self, key)
-		if (key == "tab" and table.getn(self.playerHosts) > 0 and m_get_ex_mode() == 0) then
+		if (key == "tab" and #self.playerHosts > 0 and m_get_ex_mode() == 0) then
 			local prevHost = self:getCurrentHost()
 
 			if (m_get_shift()) then
 				self.currentHost = self.currentHost - 1
 				if (self.currentHost < 1) then
-					self.currentHost = table.getn(self.playerHosts)
+					self.currentHost = #self.playerHosts
 				end
 			else
 				self.currentHost = self.currentHost + 1
-				if (self.currentHost > table.getn(self.playerHosts)) then
+				if (self.currentHost > #self.playerHosts) then
 					self.currentHost = 1
 				end
 			end
@@ -151,7 +151,7 @@ PlayerSwitcher = Interaction:subclass
 		-- Draw information about each player
 		-- and highlight the selected player
 
-		for i = 1, table.getn(self.playerHosts) do
+		for i = 1, #self.playerHosts do
 			local player = self.playerHosts[i]
 			local health_perc = player.health / player.maxHealth
 			local experience_perc = player.experience / player.nextLevelExperience
@@ -159,7 +159,7 @@ PlayerSwitcher = Interaction:subclass
 			local y = 16
 			local invHeight = 19
 
-			if (table.getn(player.inventory) == 0) then
+			if (#player.inventory) == 0 then
 				invHeight = 0
 			end
 

@@ -133,7 +133,7 @@ void initScripting()
 
 	lua_register(L, "import",           l_import);
 
-	handleLuaError(lua_dostring(L, lua_include), "lua_include");
+	handleLuaError(luaL_dostring(L, lua_include), "lua_include");
 
 
 

@@ -36,7 +36,7 @@ GuiMenu = Interaction:subclass
 		canvas:setDrawMode(DM_TRANS)
 
 		local curr = 0
-		for i = 1, table.getn(self.menuItems) do
+		for i = 1, #self.menuItems do
 			local tw, th = m_text_size(self.menuItems[i].text)
 			m_set_color(0, 0, 0)
 			m_set_cursor(self.x + (self.w - tw) / 2 + 1, self.y + curr + 1 + 1)
@@ -47,7 +47,7 @@ GuiMenu = Interaction:subclass
 		guiTheme:drawBox(self.x - 2, self.y - 2, self.w + 4, self.h + 3)
 
 		local curr = 0
-		for i = 1, table.getn(self.menuItems) do
+		for i = 1, #self.menuItems do
 			if (i == self.selected) then
 				guiTheme:drawBox(self.x, self.y + curr, self.w, self.menuItems[i]:getHeight())
 				m_set_color(200, 200, 200)
@@ -65,12 +65,12 @@ GuiMenu = Interaction:subclass
 	keyType = function(self, key)
 		if (key == "up") then
 			self.selected = self.selected - 1
-			if (self.selected == 0) then self.selected = table.getn(self.menuItems) end
+			if (self.selected == 0) then self.selected = #self.menuItems end
 			m_play_sample("bbsfx_hit1.wav")
 			return true
 		elseif (key == "down") then
 			self.selected = self.selected + 1
-			if (self.selected > table.getn(self.menuItems)) then self.selected = 1 end
+			if (self.selected > #self.menuItems) then self.selected = 1 end
 			m_play_sample("bbsfx_hit1.wav")
 			return true
 		elseif (key == "action") then

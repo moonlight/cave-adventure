@@ -29,7 +29,7 @@ InteractionMaster = Object:subclass
 
 		-- Search for the Interaction
 		iIndex = -1;
-		for i = 1, table.getn(interactionArray) do
+		for i = 1, #interactionArray do
 			if (interactionArray[i] == interaction) then
 				iIndex = i
 			end
@@ -56,14 +56,14 @@ InteractionMaster = Object:subclass
 			interactionArray = self.globalInteractions
 		--end
 
-		if (table.getn(interactionArray) == 0) then
+		if (#interactionArray) == 0 then
 			m_message("Attempt to setFocusTo with an empty interactions array.");
 			return
 		end
 
 		-- Search for the Interaction
 		iIndex = -1;
-		for i = 1, table.getn(interactionArray) do
+		for i = 1, #interactionArray do
 			if (interactionArray[i] == interaction) then
 				iIndex = i
 			end
@@ -95,7 +95,7 @@ InteractionMaster = Object:subclass
 	processTick = function(self)
 		local ia = self.globalInteractions
 
-		for i = 1, table.getn(ia) do
+		for i = 1, #ia do
 			if (ia[i].bRequiresTick) then
 				ia[i]:tick()
 			end
@@ -105,7 +105,7 @@ InteractionMaster = Object:subclass
 	processPreRender = function(self)
 		local ia = self.globalInteractions
 
-		for i = 1, table.getn(ia) do
+		for i = 1, #ia do
 			if (ia[i].bVisible) then
 				ia[i]:preRender()
 			end
@@ -115,7 +115,7 @@ InteractionMaster = Object:subclass
 	processPostRender = function(self, canvas)
 		local ia = self.globalInteractions
 
-		for i = table.getn(ia), 1, -1 do
+		for i = #ia, 1, -1 do
 			if (ia[i].bVisible) then
 				ia[i]:postRender(canvas)
 			end
@@ -125,7 +125,7 @@ InteractionMaster = Object:subclass
 	processKeyType = function(self, key)
 		local ia = self.globalInteractions
 
-		for i = 1, table.getn(ia) do
+		for i = 1, #ia do
 			if (ia[i].bActive) then
 				if (ia[i]:keyType(key)) then
 					return true -- No further processing when key is used
@@ -139,7 +139,7 @@ InteractionMaster = Object:subclass
 	processLevelChange = function(self, level)
 		local ia = self.globalInteractions
 
-		for i = 1, table.getn(ia) do
+		for i = 1, #ia do
 			ia[i]:levelChange(level)
 		end
 	end;

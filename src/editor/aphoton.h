@@ -12,7 +12,8 @@ extern int aphoton_bg_color;
 void aphoton_init(void);
 void aphoton_shutdown(void);
 
-void photon_scrollbar(BITMAP *bmp, int x, int y, int w, int h, int vert, int pos, int len);
+void photon_scrollbar(BITMAP *bmp, int x, int y, int w, int h,
+        int vert, int pos, int len);
 void photon_container(BITMAP *bmp, int x, int y, int w, int h);
 
 extern int container_black, container_gray1, container_gray2;

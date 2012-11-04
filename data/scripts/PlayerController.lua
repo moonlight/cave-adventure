@@ -39,7 +39,7 @@ PlayerController = Controller:subclass
 						local activated = false
 						local i = 1
 
-						while (i <= table.getn(objs) and not activated) do
+						while (i <= #objs and not activated) do
 							if (objs[i].bCanActivate) then
 								-- By returning true, an object can indicate nothing else should be activated
 								-- after this one.

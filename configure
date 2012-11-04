@@ -96,13 +96,23 @@ echo -n "Checking for allegro-config... "
 echo "allegro-config --version" >>$LOG
 echo "allegro-config --version" >>$LOGERR
 if allegro-config --version >>$LOG 2>>$LOGERR ; then
-    LIBS="$LIBS `allegro-config --libs`"
-    CPPFLAGS="$CPPFLAGS `allegro-config --cppflags`"
-    echo "yes"
+    allegro_version_major=`allegro-config --version | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+    allegro_version_minor=`allegro-config --version | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
+    allegro_version_micro=`allegro-config --version | sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
+    # version check
+    if test "$allegro_version_major" -ge "4" -a "$allegro_version_minor" -ge "1" ; then
+	LIBS="$LIBS `allegro-config --libs`"
+	CPPFLAGS="$CPPFLAGS `allegro-config --cppflags`"
+	echo "yes ($allegro_version_major.$allegro_version_minor.$allegro_version_micro)"
+    else
+	echo "found"
+	echo "*** Allegro version to old. required: 4.1.0 or higher."
+	exit 1;
+    fi
 else
     echo "no"
     echo "*** No allegro-config found. Please add the right directory to PATH or install allegro"
-    echo "using -lalleg instead"
+    echo "Trying -lalleg instead"
     LIBS="$LIBS -lalleg"
 fi
 echo "LIBS: $LIBS" >>$LOG
@@ -130,7 +140,8 @@ if $CC $CPPFLAGS conftest.cpp $LIBS -o /dev/null >>$LOG 2>>$LOGERR ; then
     echo "yes"
 else
     echo "no"
-    echo "*** Allegro not working"
+    echo "*** Compiling of Allegro program failed"
+    echo "*** Please install Allegro. http://alleg.sourceforge.net/"
     exit 1
 fi
 
@@ -158,11 +169,11 @@ int main(int argc, char **argv) {
 END_OF_MAIN()
 
 EOF
-echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null" >>$LOG
-echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null" >>$LOGERR
-if $CC $CPPFLAGS conftest.cpp $LIBS -llua -llualib -o /dev/null >>$LOG 2>>$LOGERR ; then
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -ldl -o /dev/null" >>$LOG
+echo "$CC $CPPFLAGS conftest.cpp $LIBS -llua -ldl -o /dev/null" >>$LOGERR
+if $CC $CPPFLAGS conftest.cpp $LIBS -llua -ldl -o /dev/null >>$LOG 2>>$LOGERR ; then
     # gelukt
-    LIBS="$LIBS -llua -llualib"
+    LIBS="$LIBS -llua"
     echo "yes"
 else
     #niet gelukt

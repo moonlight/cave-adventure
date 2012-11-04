@@ -14,7 +14,7 @@ Animation = Object:subclass
 
 	init = function(self, animation)
 		self.animSeq = animation
-		self.animLength = table.getn(animation)
+		self.animLength = #animation
 	end;
 
 	length = function(self)
@@ -102,9 +102,9 @@ LinearAni = Animation:subclass
 	end;
 
 	update_bitmap = function(self)
-		local nr = table.getn(self.animation)
+		local nr = #self.animation
 
-		if (self.animation and table.getn(self.animation) > 0) then
+		if (self.animation and #self.animation > 0) then
 			self.bitmap = self.animation[self.animation_count]
 		end
 
@@ -151,7 +151,7 @@ RandomAni = Animation:subclass
 
 	update_bitmap = function(self)
 		if (self.animation) then
-			local nr = table.getn(self.animation)
+			local nr = #self.animation
 			if (nr == 1) then
 				self.bitmap = self.animation[1]
 			elseif (nr > 1) then
@@ -196,12 +196,12 @@ FrameDurationAni = Animation:subclass
 	end;
 
 	update_bitmap = function(self)
-		if (self.animation and table.getn(self.animation) > 0) then
-			while (self.animation and table.getn(self.animation) > 0 and self.frame_count > self.animation[self.animation_count][2]) do
+		if (self.animation and #self.animation > 0) then
+			while (self.animation and #self.animation > 0 and self.frame_count > self.animation[self.animation_count][2]) do
 				self.frame_count = self.frame_count - self.animation[self.animation_count][2]
 				self.animation_count = self.animation_count + 1
 
-				if (self.animation_count > table.getn(self.animation)) then
+				if (self.animation_count > #self.animation) then
 					self.animation_count = 1
 
 					if (self.animation_finished) then
@@ -210,7 +210,7 @@ FrameDurationAni = Animation:subclass
 				end
 			end
 
-			if (self.animation and table.getn(self.animation) > 0) then
+			if (self.animation and #self.animation > 0) then
 				self.bitmap = self.animation[self.animation_count][1]
 			end
 

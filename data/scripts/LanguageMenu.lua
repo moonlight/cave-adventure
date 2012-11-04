@@ -1,5 +1,8 @@
 -- A menu to choose your language
 
+import("GuiMenu.lua")
+
+
 LanguageMenu = GuiMenu:subclass
 {
 	name = "LanguageMenu";

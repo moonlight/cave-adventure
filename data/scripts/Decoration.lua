@@ -32,7 +32,7 @@ Decoration = Actor:subclass
 		self:log("activatedBy(" .. instigator:toString() .. ")");
 		if (self.convTable) then
 			self:log("Showing conversation...");
-			n = get_new_n(self.prev_random, table.getn(self.convTable))
+			n = get_new_n(self.prev_random, #self.convTable)
 			self.prev_random = n
 			write_conversation(self.convTable[n])
 

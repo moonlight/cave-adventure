@@ -62,10 +62,10 @@ ActionSequence = Action:subclass
 	name = "ActionSequence";
 
 	init = function(self, seq)
-		m_message("ActionSequence initializing with ".. table.getn(seq) .." actions.")
+		m_message("ActionSequence initializing with ".. #seq .." actions.")
 		self.actions = {}
 
-		for i = 1, table.getn(seq) do
+		for i = 1, #seq do
 			local env = {}
 			setmetatable(env, {__index = seq[i]})
 			table.insert(self.actions, env)
@@ -75,12 +75,12 @@ ActionSequence = Action:subclass
 	end;
 
 	exec = function(self)
-		while (self.i <= table.getn(self.actions) and self.actions[self.i]:exec()) do
+		while (self.i <= #self.actions and self.actions[self.i]:exec()) do
 			m_message("ActionSequence finished executing ".. self.actions[self.i].name)
 			self.i = self.i + 1
 		end
 
-		return (self.i > table.getn(self.actions))
+		return (self.i > #self.actions)
 	end;
 }
 
@@ -89,12 +89,12 @@ ActionParallel = Action:subclass
 	name = "ActionParallel";
 
 	init = function(self, actions)
-		m_message("ActionParallel initializing with ".. table.getn(actions) .." actions.")
+		m_message("ActionParallel initializing with ".. #actions .." actions.")
 		self.actions = {}
 
 		-- Add all actions to the list of actions to execute.
 		local i
-		for i = 1, table.getn(actions) do
+		for i = 1, #actions do
 			if (actions[i] and actions[i]:instanceOf(Action)) then
 				-- Create an action execution environment for this action
 				local execEnv = {}
@@ -112,15 +112,15 @@ ActionParallel = Action:subclass
 		local i
 
 		-- Execute all running actions
-		for i = 1, table.getn(self.actions) do
-			if (i <= table.getn(self.actions) and self.actions[i]:exec()) then
+		for i = 1, #self.actions do
+			if (i <= #self.actions) and self.actions[i]:exec() then
 				m_message("ActionParallel finished executing "..self.actions[i].name)
 				table.remove(self.actions, i)
 				i = i - 1
 			end
 		end
 
-		return table.getn(self.actions) == 0
+		return #self.actions == 0
 	end;
 }
 
@@ -149,7 +149,7 @@ ActionCallFunction = Action:subclass
 
 	init = function(self, f, ...)
 		self.f = f
-		self.arg = arg
+		self.arg = {...}
 	end;
 
 	exec = function(self)
@@ -297,7 +297,7 @@ ActionWalkPath = ActionSequence:subclass
 
 		self.actions = {}
 
-		for w in string.gfind(path, "[UDLR]%d*") do
+		for w in string.gmatch(path, "[UDLR]%d*") do
 			local dir = string.sub(w,1,1)
 			if (dir == "U") then dir = DIR_UP    end
 			if (dir == "R") then dir = DIR_RIGHT end
@@ -348,7 +348,7 @@ ActionExModeOn = Action:subclass
 	exec = function(self)
 		table.insert(exModeArray, m_get_ex_mode())
 		m_set_ex_mode(1)
-		--m_message("Exclusive mode turned on (".. table.getn(exModeArray) ..")")
+		--m_message("Exclusive mode turned on (".. #exModeArray) ..")")
 		return true
 	end;
 }
@@ -358,10 +358,10 @@ ActionExModeOff = Action:subclass
 	name = "ActionExModeOff";
 
 	exec = function(self)
-		if (table.getn(exModeArray) > 0) then
-			m_set_ex_mode(exModeArray[table.getn(exModeArray)])
-			table.remove(exModeArray, table.getn(exModeArray))
-			--m_message("Exclusive mode turned off (".. table.getn(exModeArray) ..")")
+		if (#exModeArray > 0) then
+			m_set_ex_mode(exModeArray[#exModeArray])
+			table.remove(exModeArray, #exModeArray)
+			--m_message("Exclusive mode turned off (".. #exModeArray) ..")")
 		else
 			m_set_ex_mode(0)
 		end

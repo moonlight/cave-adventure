@@ -3,7 +3,7 @@
 -- 
 -- bodged by Hedde Bosman
 
-import("Player.lua")
+import("Enemy.lua")
 import("AdvAIRandom.lua")
 import("Shadow.lua")
 

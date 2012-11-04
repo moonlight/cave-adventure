@@ -3,9 +3,8 @@
 -- 
 -- Temporarily blindly copied from Hedde Bosman's rat by Georg Muntingh!
 
-import("Player.lua")
-import("AdvAIRandom.lua")
 import("Enemy.lua")
+import("AdvAIRandom.lua")
 
 Crocodile = Enemy:subclass
 {

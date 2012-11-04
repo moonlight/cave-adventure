@@ -139,7 +139,7 @@ Actor = Object:subclass
 			end
 
 			local tileName, obstacle = m_get_tile_at(self.map, x - 0.5, y - 0.5)
-			if (table.getn(objectsAtTile) == 0 and obstacle == 0) then
+			if (#objectsAtTile == 0 and obstacle == 0) then
 				table.insert(dirs, i - 1)
 			end
 		end
@@ -148,7 +148,7 @@ Actor = Object:subclass
 
 	randomFreeTileAround = function(self)
 		local dirs = self:freeTilesAround()
-		if (table.getn(dirs) > 0) then return dirs[math.random(table.getn(dirs))] end
+		if (#dirs > 0) then return dirs[math.random(#dirs)] end
 		return nil
 	end;
 

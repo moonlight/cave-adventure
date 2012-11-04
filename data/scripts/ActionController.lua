@@ -37,8 +37,8 @@ ActionController =
 		local i
 
 		-- Execute all running actions
-		for i = 1, table.getn(self.actions) do
-			if (i <= table.getn(self.actions) and self.actions[i] == execEnv) then
+		for i = 1, #self.actions do
+			if (i <= #self.actions and self.actions[i] == execEnv) then
 				m_message("Finished executing "..self.actions[i].name .." (".. self.actions[i]._id ..")")
 				table.remove(self.actions, i)
 				i = i - 1
@@ -51,8 +51,8 @@ ActionController =
 		local i
 
 		-- Execute all running actions
-		for i = 1, table.getn(self.actions) do
-			if (i <= table.getn(self.actions) and self.actions[i]:exec()) then
+		for i = 1, #self.actions do
+			if (i <= #self.actions and self.actions[i]:exec()) then
 				m_message("Finished executing "..self.actions[i].name .." (".. self.actions[i]._id ..")")
 				table.remove(self.actions, i)
 				i = i - 1

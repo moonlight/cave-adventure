@@ -48,7 +48,7 @@ Player = Character:subclass
 			if (self.dir == DIR_UP)    then ay = ay - 1 end
 			if (self.dir == DIR_DOWN)  then ay = ay + 1 end
 			local attacked_objs = m_get_objects_at(ax, ay, self.map)
-			for index, object in attacked_objs do
+			for index, object in ipairs(attacked_objs) do
 				if (object:instanceOf(Actor)) then
 					local damage = (self.attack_min_dam + math.random(self.attack_max_dam - self.attack_min_dam))*(self.strength/95 + 18/19)
 					object:takeDamage(damage, self)

@@ -2,6 +2,10 @@
 -- Some bloody splats
 --
 
+import("Actor.lua")
+import("AnimationFunctions.lua")
+
+
 BloodSplat = Actor:subclass
 {
 	name = "BloodSplat";

@@ -188,7 +188,7 @@ function write_conversation(data)
 		table.insert(conversation, name..": \""..value[2].."\"")
 	end
 
-	local n = table.getn(conversation)
+	local n = #conversation
 	convBox.lines = {}
 	convBox.lines_todo = {}
 	convBox.state = CB_CLOSED
